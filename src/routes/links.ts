@@ -1,4 +1,9 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { sql } from "drizzle-orm";
+import { HTTPException } from "hono/http-exception";
+import Sqids from "sqids";
+import { getDb } from "../db/client";
+import { links as linksTable } from "../db/schema";
 
 const LinkSchema = z
 	.object({
@@ -10,7 +15,11 @@ const LinkSchema = z
 const CreateLinkSchema = z
 	.object({
 		originalUrl: z.url().openapi({ example: "https://google.com" }),
-		alias: z.string().optional().openapi({ example: "goog" }),
+		alias: z
+			.string()
+			.regex(/^[A-Za-z0-9_-]{3,32}$/)
+			.optional()
+			.openapi({ example: "goog" }),
 	})
 	.openapi("CreateLink");
 
@@ -33,7 +42,32 @@ const postLink = createRoute({
 	},
 });
 
-export const links = new OpenAPIHono().openapi(postLink, (c) => {
+const sqids = new Sqids({ minLength: 6 });
+
+const generateShortUrl = (key: number) => sqids.encode([key]);
+
+export const links = new OpenAPIHono().openapi(postLink, async (c) => {
 	const { originalUrl, alias } = c.req.valid("json");
-	return c.json({ originalUrl, shortUrl: alias ?? "fd7hj2" }, 201);
+	const db = getDb();
+
+	const { rows } = await db.execute<{ id: string }>(
+		sql`select nextval(pg_get_serial_sequence('links', 'id')) as id`,
+	);
+
+	const id = Number(rows[0]?.id);
+
+	const [link] = await db
+		.insert(linksTable)
+		.values({ id, shortUrl: alias ?? generateShortUrl(id), originalUrl })
+		.onConflictDoNothing()
+		.returning();
+
+	if (!link) {
+		throw new HTTPException(409, { message: "Short URL already in use" });
+	}
+
+	return c.json(
+		{ originalUrl: link.originalUrl, shortUrl: link.shortUrl },
+		201,
+	);
 });
