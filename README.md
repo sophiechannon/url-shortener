@@ -1,8 +1,18 @@
-# url-shortener-api
+# url-shortener
 
-Hono + `@hono/zod-openapi` API for a URL shortener, deployed to AWS Lambda (Node 24).
+A URL shortener: a Hono + `@hono/zod-openapi` API deployed to AWS Lambda (Node 24), and a React UI.
 
-The OpenAPI spec (`openapi.json`) is the contract with the frontend, which generates its client from it.
+The OpenAPI spec (`apps/api/openapi.json`) is the contract between them. The UI generates its client from it.
+
+## Layout
+
+```
+apps/
+  api/   Hono API, Drizzle schema and migrations, openapi.json
+  ui/    React client (generated API client lives here)
+```
+
+pnpm workspaces; Biome is configured once at the root.
 
 ## Architecture
 
@@ -14,20 +24,31 @@ The OpenAPI spec (`openapi.json`) is the contract with the frontend, which gener
 
 ## Scripts
 
+From the repo root:
+
 | Command                 | What it does                                             |
 | ----------------------- | -------------------------------------------------------- |
-| `pnpm dev`              | Run locally on http://localhost:3000 with reload          |
-| `pnpm typecheck`        | Type-check with `tsc`                                    |
-| `pnpm generate:openapi` | Write `openapi.json` from the route definitions          |
-| `pnpm build`            | Bundle `src/lambda.ts` to `dist/index.mjs` with esbuild  |
-| `pnpm package`          | Build and zip to `dist/function.zip` for Lambda upload   |
+| `pnpm dev:api`          | Run the API on http://localhost:3000 with reload          |
+| `pnpm typecheck`        | Type-check every app                                     |
+| `pnpm build`            | Build every app                                          |
+| `pnpm generate:openapi` | Write `apps/api/openapi.json` from the route definitions |
+| `pnpm lint` / `lint:fix`| Biome check (and fix) across the repo                    |
+
+From `apps/api` (`pnpm --filter @url-shortener/api <script>` from the root):
+
+| Command            | What it does                                            |
+| ------------------ | ------------------------------------------------------- |
+| `pnpm package`     | Build and zip to `dist/function.zip` for Lambda upload  |
+| `pnpm db:generate` | Generate a Drizzle migration from `src/db/schema.ts`    |
+| `pnpm db:migrate`  | Apply migrations (reads `apps/api/.env.local`)          |
+| `pnpm db:studio`   | Open Drizzle Studio                                     |
 
 Run `pnpm generate:openapi` after changing any route and commit the updated `openapi.json`.
 
 ## Deploying by hand
 
-1. `pnpm package`
+1. `pnpm --filter @url-shortener/api package`
 2. Create a Lambda function with the `nodejs24.x` runtime and handler `index.handler`.
-3. Upload `dist/function.zip`.
+3. Upload `apps/api/dist/function.zip`.
 4. Optionally set `NODE_OPTIONS=--enable-source-maps` for readable stack traces.
 5. Enable a Function URL (auth type `NONE`) and hit `/health`.

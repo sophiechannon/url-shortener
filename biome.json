@@ -6,7 +6,13 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"includes": ["**", "!!**/dist"]
+		"includes": [
+			"**",
+			"!!**/dist",
+			"!**/drizzle/meta",
+			"!**/openapi.json",
+			"!skills-lock.json"
+		]
 	},
 	"formatter": {
 		"enabled": true,

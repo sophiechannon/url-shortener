@@ -1,0 +1,190 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "URL Shortener API",
+    "version": "0.1.0"
+  },
+  "components": {
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "Link": {
+        "type": "object",
+        "properties": {
+          "originalUrl": {
+            "type": "string",
+            "example": "https://google.com"
+          },
+          "shortUrl": {
+            "type": "string",
+            "example": "fd7hj2"
+          }
+        },
+        "required": [
+          "originalUrl",
+          "shortUrl"
+        ]
+      },
+      "CreateLink": {
+        "type": "object",
+        "properties": {
+          "originalUrl": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://google.com"
+          },
+          "alias": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{3,32}$",
+            "example": "goog"
+          }
+        },
+        "required": [
+          "originalUrl"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "tags": [
+          "health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/links": {
+      "get": {
+        "operationId": "listLinks",
+        "tags": [
+          "links"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "goog"
+            },
+            "required": false,
+            "name": "shortUrl",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 25
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "nullable": true,
+              "minimum": 0,
+              "default": 0
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Links",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Link"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "postLink",
+        "tags": [
+          "links"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLink"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "New link created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Link"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{shortUrl}": {
+      "get": {
+        "operationId": "getRedirect",
+        "tags": [
+          "links"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "fd7hj2"
+            },
+            "required": true,
+            "name": "shortUrl",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirects to the original URL"
+          }
+        }
+      }
+    }
+  }
+}

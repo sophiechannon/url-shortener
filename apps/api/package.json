@@ -1,0 +1,37 @@
+{
+  "name": "@url-shortener/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env.local src/dev.ts",
+    "build": "esbuild src/lambda.ts --bundle --platform=node --format=esm --target=node24 --minify --sourcemap --outfile=dist/index.mjs",
+    "package": "pnpm build && cd dist && zip -q function.zip index.mjs index.mjs.map",
+    "typecheck": "tsc --noEmit",
+    "generate:openapi": "tsx scripts/generate-openapi.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@hono/aws-lambda": "^1.0.0",
+    "@hono/zod-openapi": "^1.6.3",
+    "@neondatabase/serverless": "^1.2.0",
+    "drizzle-orm": "^0.45.3",
+    "hono": "^4.13.13",
+    "sqids": "^0.3.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@hono/node-server": "^2.1.3",
+    "@types/aws-lambda": "^8.10.164",
+    "@types/node": "^24.19.1",
+    "drizzle-kit": "^0.31.11",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
