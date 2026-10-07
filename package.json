@@ -1,23 +1,23 @@
 {
-  "name": "url-shortener",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev:api": "pnpm --filter @url-shortener/api dev",
-    "dev:ui": "pnpm --filter @url-shortener/ui dev",
-    "build": "pnpm -r build",
-    "typecheck": "pnpm -r typecheck",
-    "generate:openapi": "pnpm --filter @url-shortener/api generate:openapi",
-    "generate:api": "pnpm --filter @url-shortener/ui generate:api",
-    "codegen": "pnpm generate:openapi && pnpm generate:api",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write ."
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.5.15"
-  },
-  "engines": {
-    "node": ">=24"
-  },
-  "packageManager": "pnpm@10.33.0"
+	"name": "url-shortener",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev:api": "pnpm --filter @url-shortener/api dev",
+		"dev:ui": "pnpm --filter @url-shortener/ui dev",
+		"build": "pnpm -r build",
+		"typecheck": "pnpm -r typecheck",
+		"generate:openapi": "pnpm --filter @url-shortener/api generate:openapi",
+		"generate:api": "pnpm --filter @url-shortener/ui generate:api",
+		"codegen": "pnpm generate:openapi && pnpm generate:api",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.15"
+	},
+	"engines": {
+		"node": ">=24"
+	},
+	"packageManager": "pnpm@10.33.0"
 }

@@ -29,7 +29,7 @@ From the repo root:
 | Command                 | What it does                                             |
 | ----------------------- | -------------------------------------------------------- |
 | `pnpm dev:api`          | Run the API on http://localhost:3000 with reload          |
-| `pnpm dev:ui`           | Run the UI with Vite (http://localhost:5173 by default)  |
+| `pnpm dev:ui`           | Run the UI on http://localhost:5174 with Vite             |
 | `pnpm typecheck`        | Type-check every app                                     |
 | `pnpm build`            | Build every app                                          |
 | `pnpm generate:openapi` | Write `apps/api/openapi.json` from the route definitions |
@@ -46,9 +46,9 @@ From `apps/api` (`pnpm --filter @url-shortener/api <script>` from the root):
 | `pnpm db:migrate`  | Apply migrations (reads `apps/api/.env.local`)          |
 | `pnpm db:studio`   | Open Drizzle Studio                                     |
 
-Run `pnpm codegen` after changing any route and commit the updated `openapi.json` and `apps/ui/src/api/generated`.
+Run `pnpm codegen` after changing any route and commit the updated `openapi.json`. The UI client in `apps/ui/src/api/generated` is gitignored; it is regenerated on `pnpm install` and `build`.
 
-In dev the UI calls `/api/*`, which Vite proxies to the API on port 3000. For production, set `VITE_API_URL` to the deployed API URL.
+In dev the UI calls `/api/*`, which Vite proxies to the API on port 3000. For production, set `VITE_API_URL` to the deployed API URL (see `apps/ui/.env.example`).
 
 ## Deploying by hand
 
