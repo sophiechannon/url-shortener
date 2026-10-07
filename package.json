@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev:api": "pnpm --filter @url-shortener/api dev",
+    "dev:ui": "pnpm --filter @url-shortener/ui dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "generate:openapi": "pnpm --filter @url-shortener/api generate:openapi",

@@ -11,7 +11,9 @@
 			"!!**/dist",
 			"!**/drizzle/meta",
 			"!**/openapi.json",
-			"!skills-lock.json"
+			"!skills-lock.json",
+			"!**/routeTree.gen.ts",
+			"!apps/ui/public"
 		]
 	},
 	"formatter": {

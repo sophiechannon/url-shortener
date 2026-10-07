@@ -9,7 +9,7 @@ The OpenAPI spec (`apps/api/openapi.json`) is the contract between them. The UI 
 ```
 apps/
   api/   Hono API, Drizzle schema and migrations, openapi.json
-  ui/    React client (generated API client lives here)
+  ui/    React client: Vite, React, TypeScript, TanStack Router (file-based routes in src/routes)
 ```
 
 pnpm workspaces; Biome is configured once at the root.
@@ -29,6 +29,7 @@ From the repo root:
 | Command                 | What it does                                             |
 | ----------------------- | -------------------------------------------------------- |
 | `pnpm dev:api`          | Run the API on http://localhost:3000 with reload          |
+| `pnpm dev:ui`           | Run the UI with Vite (http://localhost:5173 by default)  |
 | `pnpm typecheck`        | Type-check every app                                     |
 | `pnpm build`            | Build every app                                          |
 | `pnpm generate:openapi` | Write `apps/api/openapi.json` from the route definitions |
