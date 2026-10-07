@@ -4,6 +4,14 @@ Hono + `@hono/zod-openapi` API for a URL shortener, deployed to AWS Lambda (Node
 
 The OpenAPI spec (`openapi.json`) is the contract with the frontend, which generates its client from it.
 
+## Architecture
+
+- React based client
+- API (Hono Zod Openapi) 
+- Lambda & function URL
+- Redis layer for re-direct lookup
+- PostgresDB (Neon)
+
 ## Scripts
 
 | Command                 | What it does                                             |
