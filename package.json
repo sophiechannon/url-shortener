@@ -8,6 +8,8 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "generate:openapi": "pnpm --filter @url-shortener/api generate:openapi",
+    "generate:api": "pnpm --filter @url-shortener/ui generate:api",
+    "codegen": "pnpm generate:openapi && pnpm generate:api",
     "lint": "biome check .",
     "lint:fix": "biome check --write ."
   },

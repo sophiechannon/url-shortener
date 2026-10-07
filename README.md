@@ -33,6 +33,8 @@ From the repo root:
 | `pnpm typecheck`        | Type-check every app                                     |
 | `pnpm build`            | Build every app                                          |
 | `pnpm generate:openapi` | Write `apps/api/openapi.json` from the route definitions |
+| `pnpm generate:api`     | Generate the UI's TanStack Query client with Orval       |
+| `pnpm codegen`          | Both of the above, in order                              |
 | `pnpm lint` / `lint:fix`| Biome check (and fix) across the repo                    |
 
 From `apps/api` (`pnpm --filter @url-shortener/api <script>` from the root):
@@ -44,7 +46,9 @@ From `apps/api` (`pnpm --filter @url-shortener/api <script>` from the root):
 | `pnpm db:migrate`  | Apply migrations (reads `apps/api/.env.local`)          |
 | `pnpm db:studio`   | Open Drizzle Studio                                     |
 
-Run `pnpm generate:openapi` after changing any route and commit the updated `openapi.json`.
+Run `pnpm codegen` after changing any route and commit the updated `openapi.json` and `apps/ui/src/api/generated`.
+
+In dev the UI calls `/api/*`, which Vite proxies to the API on port 3000. For production, set `VITE_API_URL` to the deployed API URL.
 
 ## Deploying by hand
 
