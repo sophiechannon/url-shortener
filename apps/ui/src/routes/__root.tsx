@@ -1,10 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import {
-	createRootRouteWithContext,
-	Link,
-	Outlet,
-} from "@tanstack/react-router";
+import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 type RouterContext = {
@@ -18,11 +14,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootLayout() {
 	return (
 		<>
-			<header>
-				<nav>
-					<Link to="/">URL Shortener</Link>
-				</nav>
-			</header>
 			<main>
 				<Outlet />
 			</main>
