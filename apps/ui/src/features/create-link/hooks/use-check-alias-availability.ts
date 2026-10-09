@@ -11,7 +11,7 @@ export function useCheckAliasAvailability() {
 
 	return async (alias: string, signal?: AbortSignal) => {
 		const params = { shortUrl: alias, limit: 1 };
-		const res = await queryClient.fetchQuery({
+		const res = await queryClient.query({
 			queryKey: getListLinksQueryKey(params),
 			// Always hit the API: availability can change between checks.
 			staleTime: 0,

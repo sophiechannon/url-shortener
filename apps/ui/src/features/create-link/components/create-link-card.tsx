@@ -18,8 +18,23 @@ const createLinkSchema = z.object({
 		.or(z.literal("")),
 });
 
+// Pending covers the debounce window and the request: a non-empty alias that passed
+// the sync/schema checks but hasn't had its availability check settle yet.
+// We don't use field.state.meta.isValidating: in @tanstack/form-core 1.33.5 a stale
+// timeout id makes every run after the first decrement the pending counter right away.
+function isAliasPending(
+	alias: string,
+	syncError: unknown,
+	checkedAlias: string | undefined,
+) {
+	return !!alias && !syncError && alias !== checkedAlias;
+}
+
 export function CreateLinkCard() {
 	const [shortUrl, setShortUrl] = useState<string>();
+	// The last alias whose availability check settled. TanStack Form's
+	// field.state.meta.isValidating is unreliable here (see isAliasPending below).
+	const [checkedAlias, setCheckedAlias] = useState<string>();
 	const checkAliasAvailability = useCheckAliasAvailability();
 	const createLink = useCreateLink();
 
@@ -72,10 +87,16 @@ export function CreateLinkCard() {
 						name="alias"
 						validators={{
 							onChangeAsync: async ({ value, signal }) => {
-								// Nothing to check; the form-level schema already skips async on invalid values.
 								if (!value) return undefined;
-								const isAvailable = await checkAliasAvailability(value, signal);
-								return isAvailable ? undefined : { message: "Not available" };
+								try {
+									const isAvailable = await checkAliasAvailability(
+										value,
+										signal,
+									);
+									return isAvailable ? undefined : { message: "Not available" };
+								} finally {
+									if (!signal.aborted) setCheckedAlias(value);
+								}
 							},
 						}}
 						asyncDebounceMs={300}
@@ -85,19 +106,29 @@ export function CreateLinkCard() {
 								<AliasField
 									value={field.state.value}
 									onChange={field.handleChange}
+									isPending={isAliasPending(
+										field.state.value,
+										field.state.meta.errorMap.onChange,
+										checkedAlias,
+									)}
+									isValid={field.state.meta.isValid}
 								/>
 							</FormField>
 						)}
 					</form.Field>
-					<form.Subscribe
-						selector={(state) => [state.canSubmit, state.isSubmitting] as const}
-					>
-						{([canSubmit, isSubmitting]) => (
-							<Button type="submit" disabled={!canSubmit || isSubmitting}>
-								Submit
-							</Button>
-						)}
-					</form.Subscribe>
+					<div className="pt-4">
+						<form.Subscribe
+							selector={(state) =>
+								[state.canSubmit, state.isSubmitting] as const
+							}
+						>
+							{([canSubmit, isSubmitting]) => (
+								<Button type="submit" disabled={!canSubmit || isSubmitting}>
+									Submit
+								</Button>
+							)}
+						</form.Subscribe>
+					</div>
 				</form>
 				{!!shortUrl && <div>{shortUrl}</div>}
 			</CardContent>
