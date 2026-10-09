@@ -14,7 +14,8 @@
 			"!skills-lock.json",
 			"!**/routeTree.gen.ts",
 			"!apps/ui/public",
-			"!apps/ui/src/api/generated"
+			"!apps/ui/src/api/generated",
+			"!apps/ui/src/components/ui"
 		]
 	},
 	"formatter": {
