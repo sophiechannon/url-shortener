@@ -1,8 +1,8 @@
 import type { AnyFieldApi } from "@tanstack/react-form";
 import type { ComponentProps } from "react";
 
-import { cn } from "@/lib";
-import { Field, FieldError, FieldLabel } from "../ui/field";
+import { Field } from "../ui/field";
+import { FieldLayout } from "./field-layout";
 
 type Props = ComponentProps<typeof Field> & {
 	label: string;
@@ -23,18 +23,15 @@ export function FormField({
 
 	return (
 		<Field data-invalid={isInvalid} {...rest}>
-			<div className={cn("flex flex-row justify-between items-center")}>
-				<FieldLabel
-					htmlFor={field.name}
-					aria-required={required}
-					className="gap-1"
-				>
-					{label}
-					{required && <span className="text-red-600">*</span>}
-				</FieldLabel>
-			</div>
-			{children}
-			{isInvalid && <FieldError errors={errors} />}
+			<FieldLayout
+				fieldName={field.name}
+				label={label}
+				errors={errors}
+				isInvalid={isInvalid}
+				required={required}
+			>
+				{children}
+			</FieldLayout>
 		</Field>
 	);
 }

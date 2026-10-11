@@ -33,8 +33,6 @@ type StatusIconProps = {
 };
 
 function StatusIcon({ isEmpty, isPending, isValid }: StatusIconProps) {
-	console.log("isEmpty", isEmpty, "isPending", isPending, "isValid", isValid);
-
 	if (isEmpty) {
 		return null;
 	}
