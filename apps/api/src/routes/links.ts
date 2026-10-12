@@ -7,6 +7,7 @@ import { links as linksTable } from "../db/schema";
 import {
 	CreateLinkSchema,
 	LinkSchema,
+	LinksParamsSchema,
 	ListLinksSearchParamsSchema,
 } from "../schema";
 
@@ -41,6 +42,25 @@ const listLinks = createRoute({
 		200: {
 			description: "Links",
 			content: { "application/json": { schema: z.array(LinkSchema) } },
+		},
+	},
+});
+
+const deleteLink = createRoute({
+	method: "delete",
+	path: "/links/{id}",
+	operationId: "deleteLink",
+	tags: ["links"],
+	request: {
+		params: LinksParamsSchema,
+	},
+	responses: {
+		200: {
+			description: "Link deleted",
+			content: { "application/json": { schema: LinkSchema } },
+		},
+		404: {
+			description: "Link not found",
 		},
 	},
 });
@@ -85,5 +105,22 @@ export const links = new OpenAPIHono()
 		return c.json(
 			{ originalUrl: link.originalUrl, shortUrl: link.shortUrl },
 			201,
+		);
+	})
+	.openapi(deleteLink, async (c) => {
+		const { id: shortUrl } = c.req.valid("param");
+
+		const [link] = await getDb()
+			.delete(linksTable)
+			.where(eq(linksTable.shortUrl, shortUrl))
+			.returning();
+
+		if (!link) {
+			throw new HTTPException(404, { message: "Link not found" });
+		}
+
+		return c.json(
+			{ originalUrl: link.originalUrl, shortUrl: link.shortUrl },
+			200,
 		);
 	});

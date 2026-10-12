@@ -26,4 +26,11 @@ export const ListLinksSearchParamsSchema = z
 	})
 	.openapi("GetLinksSearchParams");
 
+export const LinksParamsSchema = z
+	.object({
+		id: z.string().openapi({ example: "goog" }),
+	})
+	.openapi("LinksParams");
+
 export type ListLinksSearchParams = z.infer<typeof ListLinksSearchParamsSchema>;
+export type LinksParams = z.infer<typeof LinksParamsSchema>;

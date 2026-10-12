@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LinksTable } from "./links-table";
+import { LinksTableSuspense } from "./links-table";
 
 type Props = {
 	className?: string;
@@ -12,7 +12,7 @@ export function MyLinksCard({ className }: Props) {
 				<CardTitle>My Links</CardTitle>
 			</CardHeader>
 			<CardContent className="overflow-auto">
-				<LinksTable />
+				<LinksTableSuspense />
 			</CardContent>
 		</Card>
 	);

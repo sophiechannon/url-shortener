@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const LinkRowSchema = z.object({
-	shortUrl: z.url(),
+	shortUrl: z.object({ display: z.url(), key: z.string() }),
 	originalUrl: z.string(),
 });
 

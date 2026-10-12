@@ -162,6 +162,40 @@
         }
       }
     },
+    "/links/{id}": {
+      "delete": {
+        "operationId": "deleteLink",
+        "tags": [
+          "links"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "goog"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Link deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Link"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Link not found"
+          }
+        }
+      }
+    },
     "/{shortUrl}": {
       "get": {
         "operationId": "getRedirect",
