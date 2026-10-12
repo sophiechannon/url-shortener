@@ -15,6 +15,9 @@ export default defineConfig({
 					path: "src/api/fetcher.ts",
 					name: "customFetch",
 				},
+				query: {
+					useSuspenseQuery: true,
+				},
 			},
 		},
 	},

@@ -16,7 +16,7 @@ type Props = {
 };
 
 // temporary while using proxy. use VITE_API_URL when deployed
-const localApi = "http://localhost:3000/";
+export const localApi = "http://localhost:3000/";
 
 export function LinkResultCard({ originalUrl, shortUrl }: Props) {
 	const fullShortUrl = localApi + shortUrl;

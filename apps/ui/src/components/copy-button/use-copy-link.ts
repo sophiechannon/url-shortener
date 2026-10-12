@@ -12,7 +12,7 @@ export function useCopyLink() {
 			await navigator.clipboard.writeText(value);
 			setCopied(true);
 			window.clearTimeout(timeout.current);
-			timeout.current = window.setTimeout(() => setCopied(false), 3000);
+			timeout.current = window.setTimeout(() => setCopied(false), 500);
 		} catch {
 			showToast("Failed to copy to clipboard", "error");
 		}
