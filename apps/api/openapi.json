@@ -162,6 +162,36 @@
         }
       }
     },
+    "/links/availability": {
+      "get": {
+        "operationId": "checkAvailability",
+        "tags": [
+          "links"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "shortUrl",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Availability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/links/{id}": {
       "delete": {
         "operationId": "deleteLink",

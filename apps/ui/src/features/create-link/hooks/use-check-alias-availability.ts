@@ -1,5 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { getListLinksQueryKey, listLinks } from "@/api/generated";
+import {
+	checkAvailability,
+	getCheckAvailabilityQueryKey,
+} from "@/api/generated";
 
 /**
  * Returns a lazy checker: nothing is fetched until it's called with an alias.
@@ -10,14 +13,14 @@ export function useCheckAliasAvailability() {
 	const queryClient = useQueryClient();
 
 	return async (alias: string, signal?: AbortSignal) => {
-		const params = { shortUrl: alias, limit: 1 };
+		const params = { shortUrl: alias };
 		const res = await queryClient.query({
-			queryKey: getListLinksQueryKey(params),
+			queryKey: getCheckAvailabilityQueryKey(params),
 			// Always hit the API: availability can change between checks.
 			staleTime: 0,
 			queryFn: (context) =>
-				listLinks(params, { signal: signal ?? context.signal }),
+				checkAvailability(params, { signal: signal ?? context.signal }),
 		});
-		return res.data.length === 0;
+		return res.data;
 	};
 }

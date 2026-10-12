@@ -5,6 +5,7 @@ import Sqids from "sqids";
 import { getDb } from "../db/client";
 import { links as linksTable } from "../db/schema";
 import {
+	CheckAvailabilitySearchParams,
 	CreateLinkSchema,
 	LinkSchema,
 	LinksParamsSchema,
@@ -65,6 +66,22 @@ const deleteLink = createRoute({
 	},
 });
 
+const checkAvailability = createRoute({
+	method: "get",
+	path: "/links/availability",
+	operationId: "checkAvailability",
+	tags: ["links"],
+	request: {
+		query: CheckAvailabilitySearchParams,
+	},
+	responses: {
+		200: {
+			description: "Availability",
+			content: { "application/json": { schema: z.boolean() } },
+		},
+	},
+});
+
 const sqids = new Sqids({ minLength: 6 });
 
 const generateShortUrl = (key: number) => sqids.encode([key]);
@@ -81,6 +98,18 @@ export const links = new OpenAPIHono()
 			.where(shortUrl ? eq(linksTable.shortUrl, shortUrl) : undefined)
 			.limit(limit);
 		return c.json(matchedLinks, 200);
+	})
+	.openapi(checkAvailability, async (c) => {
+		const { shortUrl } = c.req.valid("query");
+		const matchedLinks = await getDb()
+			.select({
+				originalUrl: linksTable.originalUrl,
+				shortUrl: linksTable.shortUrl,
+			})
+			.from(linksTable)
+			.where(shortUrl ? eq(linksTable.shortUrl, shortUrl) : undefined)
+			.limit(1);
+		return c.json(!matchedLinks.length, 200);
 	})
 	.openapi(postLink, async (c) => {
 		const { originalUrl, alias } = c.req.valid("json");

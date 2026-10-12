@@ -32,5 +32,9 @@ export const LinksParamsSchema = z
 	})
 	.openapi("LinksParams");
 
+export const CheckAvailabilitySearchParams = z
+	.object({ shortUrl: z.string() })
+	.openapi("CheckAvailabilitySearchParams");
+
 export type ListLinksSearchParams = z.infer<typeof ListLinksSearchParamsSchema>;
 export type LinksParams = z.infer<typeof LinksParamsSchema>;
