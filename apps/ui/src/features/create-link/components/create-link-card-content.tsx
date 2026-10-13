@@ -1,11 +1,13 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { z } from "zod";
+import { ApiError } from "@/api/fetcher";
 import { FormField } from "@/components";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
+import { showToast } from "@/lib/toast";
 import { useCheckAliasAvailability } from "../hooks/queries/use-check-alias-availability";
 import { useCreateLink } from "../hooks/queries/use-post-link";
 import { AliasField } from "./alias-field";
@@ -55,8 +57,19 @@ export function CreateLinkCardContent({ setShortUrl }: Props) {
 					originalUrl: res.data.originalUrl,
 				});
 				formApi.reset();
-			} catch {
-				// do something (e.g. map a 409 onto the alias field error)
+			} catch (error) {
+				if (error instanceof ApiError && error.status === 409) {
+					// TanStack Form clears onSubmit errors on the field's next change.
+					formApi.setFieldMeta("alias", (meta) => ({
+						...meta,
+						errorMap: {
+							...meta.errorMap,
+							onSubmit: { message: "Not available" },
+						},
+					}));
+					return;
+				}
+				showToast("There was a problem creating your link", "error");
 			}
 		},
 	});

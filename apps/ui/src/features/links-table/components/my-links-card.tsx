@@ -11,7 +11,7 @@ export function MyLinksCard({ className }: Props) {
 			<CardHeader>
 				<CardTitle>My Links</CardTitle>
 			</CardHeader>
-			<CardContent className="overflow-auto">
+			<CardContent className="pb-2">
 				<LinksTableSuspense />
 			</CardContent>
 		</Card>

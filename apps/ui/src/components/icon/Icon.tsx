@@ -3,13 +3,23 @@ import {
 	Copy,
 	CopyCheck,
 	type LucideProps,
+	Moon,
+	Sun,
 	Trash,
 	X,
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { cn } from "@/lib";
 
-export const ICON_KEYS = ["x", "check", "copy", "copyCheck", "bin"] as const;
+export const ICON_KEYS = [
+	"x",
+	"check",
+	"copy",
+	"copyCheck",
+	"bin",
+	"sun",
+	"moon",
+] as const;
 
 export type IconKey = (typeof ICON_KEYS)[number];
 
@@ -19,6 +29,8 @@ const icons = new Map<IconKey, ComponentType<LucideProps>>([
 	["copy", Copy],
 	["copyCheck", CopyCheck],
 	["bin", Trash],
+	["sun", Sun],
+	["moon", Moon],
 ]);
 
 type IconProps = LucideProps & { name: IconKey };
