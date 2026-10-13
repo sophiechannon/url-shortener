@@ -5,8 +5,9 @@ import {
 	tableFeatures,
 	useTable,
 } from "@tanstack/react-table";
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 import { CopyButton } from "@/components";
+import { InfiniteScroll } from "@/components/inifinite-scroll/infinite-scroll";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLinksTable } from "../hooks/use-links-table";
 import type { LinkRow } from "../schemas/link-row";
@@ -20,11 +21,15 @@ const columns: ColumnDef<typeof _features, LinkRow>[] = [
 		accessorKey: "shortUrl",
 		header: "Short URL",
 		cell: ({ row }) => {
-			const shortUrlKey = row.original.shortUrl.key;
 			return (
 				<div className="flex flex-row gap-2 align-middle">
-					<CopyButton label="copy short URL" text={shortUrlKey} />
-					<Link to={shortUrlKey}>{shortUrlKey}</Link>
+					<CopyButton
+						label="copy short URL"
+						text={row.original.shortUrl.display}
+					/>
+					<Link to={row.original.shortUrl.display}>
+						{row.original.shortUrl.display}
+					</Link>
 				</div>
 			);
 		},
@@ -46,39 +51,44 @@ const columns: ColumnDef<typeof _features, LinkRow>[] = [
 ];
 
 export function LinksTable() {
-	const { linkRows } = useLinksTable();
+	const { linkRows, ...rest } = useLinksTable();
 	const table = useTable<typeof _features, LinkRow>({
 		features: _features,
 		data: linkRows,
 		columns,
 	});
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<ScrollArea className="h-50">
-			<table className="w-full text-left text-sm">
-				<thead className="sticky top-0 bg-card">
-					{table.getHeaderGroups().map((headerGroup) => (
-						<tr key={headerGroup.id}>
-							{headerGroup.headers.map((header) => (
-								<th key={header.id} className="p-2 font-medium">
-									{header.isPlaceholder ? null : <FlexRender header={header} />}
-								</th>
-							))}
-						</tr>
-					))}
-				</thead>
-				<tbody>
-					{table.getRowModel().rows.map((row) => (
-						<tr key={row.id}>
-							{row.getAllCells().map((cell) => (
-								<td key={cell.id} className="p-2">
-									<FlexRender cell={cell} />
-								</td>
-							))}
-						</tr>
-					))}
-				</tbody>
-			</table>
+		<ScrollArea className="h-50" ref={scrollContainerRef}>
+			<InfiniteScroll containerRef={scrollContainerRef} {...rest}>
+				<table className="w-full text-left text-sm">
+					<thead className="sticky top-0 bg-card">
+						{table.getHeaderGroups().map((headerGroup) => (
+							<tr key={headerGroup.id}>
+								{headerGroup.headers.map((header) => (
+									<th key={header.id} className="p-2 font-medium">
+										{header.isPlaceholder ? null : (
+											<FlexRender header={header} />
+										)}
+									</th>
+								))}
+							</tr>
+						))}
+					</thead>
+					<tbody>
+						{table.getRowModel().rows.map((row) => (
+							<tr key={row.id}>
+								{row.getAllCells().map((cell) => (
+									<td key={cell.id} className="p-2">
+										<FlexRender cell={cell} />
+									</td>
+								))}
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</InfiniteScroll>
 		</ScrollArea>
 	);
 }

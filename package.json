@@ -11,10 +11,12 @@
 		"generate:api": "pnpm --filter @url-shortener/ui generate:api",
 		"codegen": "pnpm generate:openapi && pnpm generate:api",
 		"lint": "biome check .",
-		"lint:fix": "biome check --write ."
+		"lint:fix": "biome check --write .",
+		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.15"
+		"@biomejs/biome": "2.5.15",
+		"husky": "^9.1.7"
 	},
 	"engines": {
 		"node": ">=24"

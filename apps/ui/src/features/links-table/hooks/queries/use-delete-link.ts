@@ -1,5 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { getListLinksQueryKey, useDeleteLink as useDeleteLinkMutation } from "@/api/generated";
+import {
+	getListLinksInfiniteQueryKey,
+	useDeleteLink as useDeleteLinkMutation,
+} from "@/api/generated";
 
 export function useDeleteLink() {
 	const queryClient = useQueryClient();
@@ -8,7 +11,7 @@ export function useDeleteLink() {
 		mutation: {
 			onSuccess: async () => {
 				await queryClient.invalidateQueries({
-					queryKey: getListLinksQueryKey(),
+					queryKey: getListLinksInfiniteQueryKey(),
 				});
 			},
 		},

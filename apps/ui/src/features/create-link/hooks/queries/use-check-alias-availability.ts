@@ -4,11 +4,6 @@ import {
 	getCheckAvailabilityQueryKey,
 } from "@/api/generated";
 
-/**
- * Returns a lazy checker: nothing is fetched until it's called with an alias.
- * Resolves to true when no link uses that alias. Network errors reject, so
- * callers can tell "couldn't check" apart from "taken".
- */
 export function useCheckAliasAvailability() {
 	const queryClient = useQueryClient();
 

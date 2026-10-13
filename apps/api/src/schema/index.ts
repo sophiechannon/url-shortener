@@ -1,1 +1,1 @@
-export * from "./links/links-schema";
+export * from "./links/links-response-schema";

@@ -1,12 +1,24 @@
 import type { Link } from "@/api/generated/url-shortener-api.schemas";
 import { localApi } from "@/features/create-link/components/link-result-card-content";
 import type { LinkRow } from "../schemas/link-row";
-import { useLinks } from "./queries/use-links";
+import { useLinksInfinite } from "./queries/use-links-inifinte";
 
 export function useLinksTable() {
-	const { links } = useLinks();
+	const {
+		links,
+		fetchNextPage,
+		hasNextPage,
+		isFetchNextPageError,
+		isFetchingNextPage,
+	} = useLinksInfinite();
 	const linkRows = mapLinksToLinkRow(links);
-	return { linkRows };
+	return {
+		linkRows,
+		fetchNextPage,
+		hasNextPage,
+		isFetchNextPageError,
+		isFetchingNextPage,
+	};
 }
 
 function mapLinksToLinkRow(links: Link[]): LinkRow[] {

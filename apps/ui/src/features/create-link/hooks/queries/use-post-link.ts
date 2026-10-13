@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { getListLinksQueryKey, usePostLink } from "@/api/generated";
+import { getListLinksInfiniteQueryKey, usePostLink } from "@/api/generated";
 
 export function useCreateLink() {
 	const queryClient = useQueryClient();
@@ -8,7 +8,7 @@ export function useCreateLink() {
 		mutation: {
 			onSuccess: async () => {
 				await queryClient.invalidateQueries({
-					queryKey: getListLinksQueryKey(),
+					queryKey: getListLinksInfiniteQueryKey(),
 				});
 			},
 		},

@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
-import { useCheckAliasAvailability } from "../hooks/use-check-alias-availability";
-import { useCreateLink } from "../hooks/use-post-link";
+import { useCheckAliasAvailability } from "../hooks/queries/use-check-alias-availability";
+import { useCreateLink } from "../hooks/queries/use-post-link";
 import { AliasField } from "./alias-field";
 
 const createLinkSchema = z.object({

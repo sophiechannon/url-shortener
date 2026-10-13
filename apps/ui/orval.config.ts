@@ -10,13 +10,20 @@ export default defineConfig({
 			httpClient: "fetch",
 			namingConvention: "kebab-case",
 			clean: true,
+
 			override: {
 				mutator: {
 					path: "src/api/fetcher.ts",
 					name: "customFetch",
 				},
-				query: {
-					useSuspenseQuery: true,
+				operations: {
+					listLinks: {
+						query: {
+							useInfinite: true,
+							useSuspenseInfiniteQuery: true,
+							useInfiniteQueryParam: "cursor",
+						},
+					},
 				},
 			},
 		},

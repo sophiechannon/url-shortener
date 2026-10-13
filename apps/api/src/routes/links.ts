@@ -1,16 +1,15 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { eq, sql } from "drizzle-orm";
+import { desc, eq, lt, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import Sqids from "sqids";
 import { getDb } from "../db/client";
 import { links as linksTable } from "../db/schema";
+import { CreateLinkSchema, LinkSchema, ListLinksSchema } from "../schema";
 import {
 	CheckAvailabilitySearchParams,
-	CreateLinkSchema,
-	LinkSchema,
 	LinksParamsSchema,
 	ListLinksSearchParamsSchema,
-} from "../schema";
+} from "../schema/links/links-params-schema";
 
 const postLink = createRoute({
 	method: "post",
@@ -42,7 +41,7 @@ const listLinks = createRoute({
 	responses: {
 		200: {
 			description: "Links",
-			content: { "application/json": { schema: z.array(LinkSchema) } },
+			content: { "application/json": { schema: ListLinksSchema } },
 		},
 	},
 });
@@ -88,16 +87,30 @@ const generateShortUrl = (key: number) => sqids.encode([key]);
 
 export const links = new OpenAPIHono()
 	.openapi(listLinks, async (c) => {
-		const { shortUrl, limit } = c.req.valid("query");
-		const matchedLinks = await getDb()
+		const { cursor, limit } = c.req.valid("query");
+		const rows = await getDb()
 			.select({
+				id: linksTable.id,
 				originalUrl: linksTable.originalUrl,
 				shortUrl: linksTable.shortUrl,
 			})
 			.from(linksTable)
-			.where(shortUrl ? eq(linksTable.shortUrl, shortUrl) : undefined)
-			.limit(limit);
-		return c.json(matchedLinks, 200);
+			.where(cursor ? lt(linksTable.id, cursor) : undefined)
+			.orderBy(desc(linksTable.id))
+			.limit(limit + 1);
+
+		const hasMore = rows.length > limit;
+		const page = rows.slice(0, limit);
+		return c.json(
+			{
+				items: page.map(({ originalUrl, shortUrl }) => ({
+					originalUrl,
+					shortUrl,
+				})),
+				nextCursor: hasMore ? (page.at(-1)?.id ?? null) : null,
+			},
+			200,
+		);
 	})
 	.openapi(checkAvailability, async (c) => {
 		const { shortUrl } = c.req.valid("query");

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CreateLinkCard } from "@/features/create-link";
-import { MyLinksCard } from "@/features/my-links";
+import { MyLinksCard } from "@/features/links-table";
 
 export const Route = createFileRoute("/_app/")({
 	component: HomePage,
