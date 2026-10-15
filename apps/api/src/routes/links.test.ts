@@ -11,13 +11,19 @@ type ListLinks = z.infer<typeof ListLinksSchema>;
 
 const sqids = new Sqids({ minLength: 6 });
 
-const seedLinks = (count: number) =>
+const ALICE = "user_alice";
+const BOB = "user_bob";
+
+const authHeader = (userId: string) => ({ Authorization: `Bearer ${userId}` });
+
+const seedLinks = (count: number, userId: string | null = ALICE) =>
 	testDb
 		.insert(links)
 		.values(
 			Array.from({ length: count }, (_, i) => ({
 				shortUrl: `link-${i + 1}`,
 				originalUrl: `https://example.com/${i + 1}`,
+				userId,
 			})),
 		)
 		.returning();
@@ -33,19 +39,54 @@ const claimGeneratedShortUrls = (ids: number[]) =>
 		})),
 	);
 
-const getLinks = async (query = "") =>
-	(await (await app.request(`/links${query}`)).json()) as ListLinks;
+const getLinks = async (query = "", userId = ALICE) =>
+	(await (
+		await app.request(`/links${query}`, { headers: authHeader(userId) })
+	).json()) as ListLinks;
 
-const postLink = (body: unknown) =>
+const postLink = (body: unknown, userId?: string) =>
 	app.request("/links", {
 		method: "POST",
-		headers: { "Content-Type": "application/json" },
+		headers: {
+			"Content-Type": "application/json",
+			...(userId ? authHeader(userId) : {}),
+		},
 		body: JSON.stringify(body),
 	});
 
+const deleteLink = (shortUrl: string, userId = ALICE) =>
+	app.request(`/links/${shortUrl}`, {
+		method: "DELETE",
+		headers: authHeader(userId),
+	});
+
 describe("GET /links", () => {
-	it("returns an empty page when there are no links", async () => {
+	it("returns 401 when signed out", async () => {
 		const res = await app.request("/links");
+
+		expect(res.status).toBe(401);
+		expect(await res.json()).toEqual({ error: "Sign in required" });
+	});
+
+	it("returns 401 for an invalid session token", async () => {
+		const res = await app.request("/links", {
+			headers: { Authorization: "Bearer not-a-real-token" },
+		});
+
+		expect(res.status).toBe(401);
+		expect(await res.json()).toEqual({ error: "Invalid session token" });
+	});
+
+	it("returns 401 for a malformed authorization header", async () => {
+		const res = await app.request("/links", {
+			headers: { Authorization: ALICE },
+		});
+
+		expect(res.status).toBe(401);
+	});
+
+	it("returns an empty page when there are no links", async () => {
+		const res = await app.request("/links", { headers: authHeader(ALICE) });
 
 		expect(res.status).toBe(200);
 		expect(await res.json()).toEqual({ items: [], nextCursor: null });
@@ -54,7 +95,7 @@ describe("GET /links", () => {
 	it("returns links newest first without exposing internal fields", async () => {
 		await seedLinks(3);
 
-		const res = await app.request("/links");
+		const res = await app.request("/links", { headers: authHeader(ALICE) });
 
 		expect(await res.json()).toEqual({
 			items: [
@@ -108,13 +149,47 @@ describe("GET /links", () => {
 		expect(seen).toEqual(["link-5", "link-4", "link-3", "link-2", "link-1"]);
 	});
 
+	it("returns only the signed-in user's links", async () => {
+		await testDb.insert(links).values([
+			{ shortUrl: "alice-1", originalUrl: "https://a.com", userId: ALICE },
+			{ shortUrl: "bob-1", originalUrl: "https://b.com", userId: BOB },
+			{ shortUrl: "anon-1", originalUrl: "https://c.com", userId: null },
+			{ shortUrl: "alice-2", originalUrl: "https://a.com/2", userId: ALICE },
+		]);
+
+		const body = await getLinks();
+
+		expect(body.items.map((l) => l.shortUrl)).toEqual(["alice-2", "alice-1"]);
+	});
+
+	it("paginates within the signed-in user's links", async () => {
+		await testDb.insert(links).values([
+			{ shortUrl: "alice-1", originalUrl: "https://a.com", userId: ALICE },
+			{ shortUrl: "bob-1", originalUrl: "https://b.com", userId: BOB },
+			{ shortUrl: "alice-2", originalUrl: "https://a.com", userId: ALICE },
+			{ shortUrl: "bob-2", originalUrl: "https://b.com", userId: BOB },
+			{ shortUrl: "alice-3", originalUrl: "https://a.com", userId: ALICE },
+		]);
+
+		const first = await getLinks("?limit=2");
+		const second = await getLinks(`?limit=2&cursor=${first.nextCursor}`);
+
+		expect(first.items.map((l) => l.shortUrl)).toEqual(["alice-3", "alice-2"]);
+		expect(second).toEqual({
+			items: [expect.objectContaining({ shortUrl: "alice-1" })],
+			nextCursor: null,
+		});
+	});
+
 	it.each([
 		["0", "below the minimum"],
 		["101", "above the maximum"],
 		["abc", "not a number"],
 		["1.5", "not an integer"],
 	])("rejects limit=%s (%s)", async (limit) => {
-		const res = await app.request(`/links?limit=${limit}`);
+		const res = await app.request(`/links?limit=${limit}`, {
+			headers: authHeader(ALICE),
+		});
 
 		expect(res.status).toBe(400);
 		expect(await res.json()).toMatchObject({ error: "Validation failed" });
@@ -130,7 +205,7 @@ describe("GET /links/availability", () => {
 	});
 
 	it("returns false when the short URL is taken", async () => {
-		await seedLinks(1);
+		await seedLinks(1, BOB);
 
 		const res = await app.request("/links/availability?shortUrl=link-1");
 
@@ -247,6 +322,53 @@ describe("POST /links", () => {
 		expect(((await res.json()) as Link).shortUrl).toBe(sqids.encode([3]));
 	});
 
+	it("creates an ownerless link when signed out", async () => {
+		await postLink({ originalUrl: "https://example.com", alias: "anon" });
+
+		const [row] = await testDb.select().from(links);
+
+		expect(row?.userId).toBeNull();
+	});
+
+	it("assigns the link to the signed-in user", async () => {
+		await postLink(
+			{ originalUrl: "https://example.com", alias: "mine" },
+			ALICE,
+		);
+
+		const [row] = await testDb.select().from(links);
+
+		expect(row?.userId).toBe(ALICE);
+		expect((await getLinks()).items).toEqual([
+			{ shortUrl: "mine", originalUrl: "https://example.com" },
+		]);
+	});
+
+	it("returns 401 for an invalid session token instead of creating anonymously", async () => {
+		const res = await app.request("/links", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: "Bearer expired",
+			},
+			body: JSON.stringify({ originalUrl: "https://example.com" }),
+		});
+
+		expect(res.status).toBe(401);
+		expect(await testDb.select().from(links)).toHaveLength(0);
+	});
+
+	it("rejects an alias already used by another user", async () => {
+		await postLink({ originalUrl: "https://one.com", alias: "taken" }, BOB);
+
+		const res = await postLink(
+			{ originalUrl: "https://two.com", alias: "taken" },
+			ALICE,
+		);
+
+		expect(res.status).toBe(409);
+	});
+
 	it.each<[unknown, string]>([
 		[{}, "missing originalUrl"],
 		[{ originalUrl: "not a url" }, "invalid originalUrl"],
@@ -272,7 +394,7 @@ describe("DELETE /links/:id", () => {
 	it("deletes the link by short URL and returns it", async () => {
 		await seedLinks(2);
 
-		const res = await app.request("/links/link-1", { method: "DELETE" });
+		const res = await deleteLink("link-1");
 
 		expect(res.status).toBe(200);
 		expect(await res.json()).toEqual({
@@ -284,9 +406,36 @@ describe("DELETE /links/:id", () => {
 	});
 
 	it("returns 404 when the link does not exist", async () => {
-		const res = await app.request("/links/missing", { method: "DELETE" });
+		const res = await deleteLink("missing");
 
 		expect(res.status).toBe(404);
 		expect(await res.json()).toEqual({ error: "Link not found" });
+	});
+
+	it("returns 401 when signed out", async () => {
+		await seedLinks(1);
+
+		const res = await app.request("/links/link-1", { method: "DELETE" });
+
+		expect(res.status).toBe(401);
+		expect(await testDb.select().from(links)).toHaveLength(1);
+	});
+
+	it("returns 404 for another user's link and keeps it", async () => {
+		await seedLinks(1, BOB);
+
+		const res = await deleteLink("link-1", ALICE);
+
+		expect(res.status).toBe(404);
+		expect(await testDb.select().from(links)).toHaveLength(1);
+	});
+
+	it("returns 404 for an ownerless link and keeps it", async () => {
+		await seedLinks(1, null);
+
+		const res = await deleteLink("link-1", ALICE);
+
+		expect(res.status).toBe(404);
+		expect(await testDb.select().from(links)).toHaveLength(1);
 	});
 });

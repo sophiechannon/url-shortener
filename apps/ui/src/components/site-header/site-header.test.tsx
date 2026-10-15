@@ -18,4 +18,13 @@ describe("SiteHeader", () => {
 			await screen.findByRole("button", { name: "Toggle theme" }),
 		).toBeInTheDocument();
 	});
+
+	it("shows sign in and sign up buttons when signed out", async () => {
+		await renderWithProviders(<SiteHeader />);
+
+		expect(
+			await screen.findByRole("button", { name: "Sign in" }),
+		).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Sign up" })).toBeInTheDocument();
+	});
 });

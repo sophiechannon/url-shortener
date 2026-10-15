@@ -5,6 +5,13 @@
     "version": "0.1.0"
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Clerk session token"
+      }
+    },
     "schemas": {
       "Health": {
         "type": "object",
@@ -85,6 +92,12 @@
         "tags": [
           "links"
         ],
+        "description": "The signed-in user's links, newest first.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -141,6 +154,7 @@
         "tags": [
           "links"
         ],
+        "description": "Signed-in users own the links they create.",
         "requestBody": {
           "required": true,
           "content": {
@@ -201,6 +215,11 @@
         "tags": [
           "links"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -222,6 +241,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not signed in"
           },
           "404": {
             "description": "Link not found"

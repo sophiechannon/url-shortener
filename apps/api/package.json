@@ -16,6 +16,7 @@
 		"test:watch": "vitest"
 	},
 	"dependencies": {
+		"@clerk/backend": "^3.23.2",
 		"@hono/aws-lambda": "^1.0.0",
 		"@hono/zod-openapi": "^1.6.3",
 		"@neondatabase/serverless": "^1.2.0",

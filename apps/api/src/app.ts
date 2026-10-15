@@ -20,6 +20,12 @@ export const app = new OpenAPIHono({
 	},
 });
 
+app.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
+	type: "http",
+	scheme: "bearer",
+	description: "Clerk session token",
+});
+
 app.route("/", health);
 app.route("/", links);
 

@@ -1,7 +1,8 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { desc, eq, lt, sql } from "drizzle-orm";
+import { and, desc, eq, lt, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import Sqids from "sqids";
+import { type AuthEnv, clerkAuth, requireUserId } from "../auth";
 import { getDb } from "../db/client";
 import { links as linksTable } from "../db/schema";
 import { CreateLinkSchema, LinkSchema, ListLinksSchema } from "../schema";
@@ -16,6 +17,7 @@ const postLink = createRoute({
 	path: "/links",
 	operationId: "postLink",
 	tags: ["links"],
+	description: "Signed-in users own the links they create.",
 	request: {
 		body: {
 			required: true,
@@ -35,6 +37,8 @@ const listLinks = createRoute({
 	path: "/links",
 	operationId: "listLinks",
 	tags: ["links"],
+	description: "The signed-in user's links, newest first.",
+	security: [{ bearerAuth: [] }],
 	request: {
 		query: ListLinksSearchParamsSchema,
 	},
@@ -51,6 +55,7 @@ const deleteLink = createRoute({
 	path: "/links/{id}",
 	operationId: "deleteLink",
 	tags: ["links"],
+	security: [{ bearerAuth: [] }],
 	request: {
 		params: LinksParamsSchema,
 	},
@@ -59,6 +64,7 @@ const deleteLink = createRoute({
 			description: "Link deleted",
 			content: { "application/json": { schema: LinkSchema } },
 		},
+		401: { description: "Not signed in" },
 		404: {
 			description: "Link not found",
 		},
@@ -87,8 +93,15 @@ const generateShortUrl = (key: number) => sqids.encode([key]);
 
 const MAX_CREATE_ATTEMPTS = 3;
 
-export const links = new OpenAPIHono()
+export const links = new OpenAPIHono<AuthEnv>();
+
+// Scoped to /links so it doesn't run for routes mounted after this router.
+links.use("/links", clerkAuth);
+links.use("/links/*", clerkAuth);
+
+links
 	.openapi(listLinks, async (c) => {
+		const userId = requireUserId(c.get("userId"));
 		const { cursor, limit } = c.req.valid("query");
 		const rows = await getDb()
 			.select({
@@ -97,7 +110,12 @@ export const links = new OpenAPIHono()
 				shortUrl: linksTable.shortUrl,
 			})
 			.from(linksTable)
-			.where(cursor ? lt(linksTable.id, cursor) : undefined)
+			.where(
+				and(
+					eq(linksTable.userId, userId),
+					cursor ? lt(linksTable.id, cursor) : undefined,
+				),
+			)
 			.orderBy(desc(linksTable.id))
 			.limit(limit + 1);
 
@@ -128,6 +146,7 @@ export const links = new OpenAPIHono()
 	})
 	.openapi(postLink, async (c) => {
 		const { originalUrl, alias } = c.req.valid("json");
+		const userId = c.get("userId");
 		const db = getDb();
 
 		// A generated short URL can collide with an existing alias. Ids are never
@@ -141,7 +160,12 @@ export const links = new OpenAPIHono()
 
 			const [link] = await db
 				.insert(linksTable)
-				.values({ id, shortUrl: alias ?? generateShortUrl(id), originalUrl })
+				.values({
+					id,
+					shortUrl: alias ?? generateShortUrl(id),
+					originalUrl,
+					userId,
+				})
 				.onConflictDoNothing()
 				.returning();
 
@@ -159,11 +183,16 @@ export const links = new OpenAPIHono()
 		throw new HTTPException(409, { message: "Short URL already in use" });
 	})
 	.openapi(deleteLink, async (c) => {
+		const userId = requireUserId(c.get("userId"));
 		const { id: shortUrl } = c.req.valid("param");
 
+		// Someone else's link is reported as not found rather than forbidden, so
+		// this can't be used to probe which short URLs exist.
 		const [link] = await getDb()
 			.delete(linksTable)
-			.where(eq(linksTable.shortUrl, shortUrl))
+			.where(
+				and(eq(linksTable.shortUrl, shortUrl), eq(linksTable.userId, userId)),
+			)
 			.returning();
 
 		if (!link) {

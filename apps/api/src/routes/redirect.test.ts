@@ -43,7 +43,9 @@ describe("GET /:shortUrl", () => {
 
 			const res = await app.request(path);
 
-			expect(res.status).toBe(200);
+			// The real route answers (GET /links is a 401 when signed out).
+			expect(res.status).not.toBe(302);
+			expect(res.headers.get("Location")).toBeNull();
 		},
 	);
 });

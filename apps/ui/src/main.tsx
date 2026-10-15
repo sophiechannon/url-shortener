@@ -1,3 +1,5 @@
+import { ClerkProvider } from "@clerk/react";
+import { shadcn } from "@clerk/ui/themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
@@ -26,8 +28,10 @@ if (!rootElement) throw new Error("Root element #root not found");
 
 createRoot(rootElement).render(
 	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<RouterProvider router={router} />
-		</QueryClientProvider>
+		<ClerkProvider afterSignOutUrl="/" appearance={{ theme: shadcn }}>
+			<QueryClientProvider client={queryClient}>
+				<RouterProvider router={router} />
+			</QueryClientProvider>
+		</ClerkProvider>
 	</StrictMode>,
 );

@@ -1,3 +1,5 @@
+import { getToken } from "@clerk/react";
+
 // Every generated request goes through here (see orval.config.ts).
 // In dev, VITE_API_URL is unset and requests go to /api, which Vite
 // proxies to the local API. In production, set VITE_API_URL to the API's URL.
@@ -18,7 +20,13 @@ export const customFetch = async <T>(
 	url: string,
 	options: RequestInit,
 ): Promise<T> => {
-	const res = await fetch(`${baseUrl}${url}`, options);
+	// Resolves to null when signed out, so those requests go out anonymously.
+	const token = await getToken();
+	// Headers accepts every form orval might pass (object, array or Headers).
+	const headers = new Headers(options.headers);
+	if (token) headers.set("Authorization", `Bearer ${token}`);
+
+	const res = await fetch(`${baseUrl}${url}`, { ...options, headers });
 	const body = [204, 205, 304].includes(res.status) ? "" : await res.text();
 	const data = body ? JSON.parse(body) : undefined;
 
