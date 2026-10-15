@@ -60,13 +60,23 @@ describe("MyLinksCard", () => {
 		).toBeInTheDocument();
 	});
 
-	it("shows only the headers when there are no links", async () => {
+	it("shows the column headers", async () => {
+		db.seed(1);
+
 		await renderLoaded();
 
 		expect(
 			screen.getAllByRole("columnheader").map((h) => h.textContent),
 		).toEqual(["Short URL", "Original URL", "Actions"]);
-		expect(dataRows()).toHaveLength(0);
+	});
+
+	it("prompts to create a link when there are none", async () => {
+		await renderWithProviders(<MyLinksCard />);
+
+		expect(
+			await screen.findByText("You have no links yet, why not create one now?"),
+		).toBeInTheDocument();
+		expect(screen.queryByRole("table")).not.toBeInTheDocument();
 	});
 
 	it("copies a link's short URL", async () => {

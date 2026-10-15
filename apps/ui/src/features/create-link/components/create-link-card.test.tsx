@@ -202,12 +202,12 @@ describe("CreateLinkCard", () => {
 			</>,
 		);
 		await screen.findByText("Shorten any URL...");
-		const table = await screen.findByRole("table");
-		expect(within(table).queryAllByRole("row")).toHaveLength(1);
+		await screen.findByText("You have no links yet, why not create one now?");
 
 		await user.type(screen.getByLabelText(/URL/), "https://example.com");
 		await user.click(submitButton());
 
+		const table = await screen.findByRole("table");
 		expect(
 			await within(table).findByRole("link", { name: "https://example.com" }),
 		).toBeInTheDocument();
