@@ -7,6 +7,7 @@
 		"dev:ui": "pnpm --filter @url-shortener/ui dev",
 		"build": "pnpm -r build",
 		"typecheck": "pnpm -r typecheck",
+		"test": "pnpm -r test",
 		"generate:openapi": "pnpm --filter @url-shortener/api generate:openapi",
 		"generate:api": "pnpm --filter @url-shortener/ui generate:api",
 		"codegen": "pnpm generate:openapi && pnpm generate:api",

@@ -8,12 +8,12 @@ type Props = {
 };
 export function DeleteLinkButton({ shortUrl }: Props) {
 	const deleteLink = useDeleteLink();
-	const handleDelete = async () => {
-		try {
-			void deleteLink.mutate({ id: shortUrl });
-		} catch {
-			showToast("Link could not be delete", "error");
-		}
+	// mutate() never throws, so failures are handled in onError rather than try/catch.
+	const handleDelete = () => {
+		deleteLink.mutate(
+			{ id: shortUrl },
+			{ onError: () => showToast("Link could not be deleted", "error") },
+		);
 	};
 	return (
 		<Button size="icon" aria-label="delete link" onClick={handleDelete}>

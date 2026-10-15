@@ -2,6 +2,7 @@ import {
 	Check,
 	Copy,
 	CopyCheck,
+	Link,
 	type LucideProps,
 	Moon,
 	Sun,
@@ -19,6 +20,7 @@ export const ICON_KEYS = [
 	"bin",
 	"sun",
 	"moon",
+	"link",
 ] as const;
 
 export type IconKey = (typeof ICON_KEYS)[number];
@@ -31,6 +33,7 @@ const icons = new Map<IconKey, ComponentType<LucideProps>>([
 	["bin", Trash],
 	["sun", Sun],
 	["moon", Moon],
+	["link", Link],
 ]);
 
 type IconProps = LucideProps & { name: IconKey };

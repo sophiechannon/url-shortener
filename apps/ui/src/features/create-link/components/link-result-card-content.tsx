@@ -26,11 +26,11 @@ export function LinkResultCard({ originalUrl, shortUrl, resetUrls }: Props) {
 		<CardContent>
 			<FieldGroup>
 				<FieldLayout label="Original URL" fieldName="original-url">
-					<Input value={originalUrl} readOnly />
+					<Input id="original-url" value={originalUrl} readOnly />
 				</FieldLayout>
 				<FieldLayout label="Short URL" fieldName="short-url">
 					<InputGroup>
-						<InputGroupInput value={fullShortUrl} readOnly />
+						<InputGroupInput id="short-url" value={fullShortUrl} readOnly />
 						<InputGroupAddon>
 							<CopyButton text={fullShortUrl} label={"copy short URL"} />
 						</InputGroupAddon>

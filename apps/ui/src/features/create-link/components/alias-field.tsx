@@ -7,15 +7,17 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 type Props = {
+	id?: string;
 	value: string;
 	onChange: (value: string) => void;
 	isPending: boolean;
 	isValid: boolean;
 };
-export function AliasField({ value, onChange, isPending, isValid }: Props) {
+export function AliasField({ id, value, onChange, isPending, isValid }: Props) {
 	return (
 		<InputGroup>
 			<InputGroupInput
+				id={id}
 				value={value}
 				onChange={(event) => onChange(event.target.value)}
 			/>

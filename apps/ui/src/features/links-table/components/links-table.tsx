@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-table";
 import { Suspense, useRef } from "react";
 import { CopyButton } from "@/components";
+import { Icon } from "@/components/icon";
 import { InfiniteScroll } from "@/components/inifinite-scroll/infinite-scroll";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLinksTable } from "../hooks/use-links-table";
@@ -38,7 +39,9 @@ const columns: ColumnDef<typeof _features, LinkRow>[] = [
 		accessorKey: "originalUrl",
 		header: "Original URL",
 		cell: ({ row }) => (
-			<Link to={row.original.originalUrl}>{row.original.originalUrl}</Link>
+			<Link className="wrap-anywhere" to={row.original.originalUrl}>
+				{row.original.originalUrl}
+			</Link>
 		),
 	},
 	{
@@ -58,6 +61,14 @@ export function LinksTable() {
 		columns,
 	});
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	if (!linkRows.length) {
+		return (
+			<div className="h-50 flex justify-between">
+				You have no links yet, why not create one now?
+				<Icon name="link" className="h-50 w-50 text-primary" />
+			</div>
+		);
+	}
 
 	return (
 		<ScrollArea className="h-50" ref={scrollContainerRef}>

@@ -85,6 +85,8 @@ const sqids = new Sqids({ minLength: 6 });
 
 const generateShortUrl = (key: number) => sqids.encode([key]);
 
+const MAX_CREATE_ATTEMPTS = 3;
+
 export const links = new OpenAPIHono()
 	.openapi(listLinks, async (c) => {
 		const { cursor, limit } = c.req.valid("query");
@@ -128,26 +130,33 @@ export const links = new OpenAPIHono()
 		const { originalUrl, alias } = c.req.valid("json");
 		const db = getDb();
 
-		const { rows } = await db.execute<{ id: string }>(
-			sql`select nextval(pg_get_serial_sequence('links', 'id')) as id`,
-		);
+		// A generated short URL can collide with an existing alias. Ids are never
+		// reused, so retrying with the next id skips the taken code for good.
+		for (let attempt = 0; attempt < MAX_CREATE_ATTEMPTS; attempt++) {
+			const { rows } = await db.execute<{ id: string }>(
+				sql`select nextval(pg_get_serial_sequence('links', 'id')) as id`,
+			);
 
-		const id = Number(rows[0]?.id);
+			const id = Number(rows[0]?.id);
 
-		const [link] = await db
-			.insert(linksTable)
-			.values({ id, shortUrl: alias ?? generateShortUrl(id), originalUrl })
-			.onConflictDoNothing()
-			.returning();
+			const [link] = await db
+				.insert(linksTable)
+				.values({ id, shortUrl: alias ?? generateShortUrl(id), originalUrl })
+				.onConflictDoNothing()
+				.returning();
 
-		if (!link) {
-			throw new HTTPException(409, { message: "Short URL already in use" });
+			if (link) {
+				return c.json(
+					{ originalUrl: link.originalUrl, shortUrl: link.shortUrl },
+					201,
+				);
+			}
+
+			// A taken alias won't free up on retry.
+			if (alias) break;
 		}
 
-		return c.json(
-			{ originalUrl: link.originalUrl, shortUrl: link.shortUrl },
-			201,
-		);
+		throw new HTTPException(409, { message: "Short URL already in use" });
 	})
 	.openapi(deleteLink, async (c) => {
 		const { id: shortUrl } = c.req.valid("param");

@@ -89,6 +89,7 @@ export function CreateLinkCardContent({ setShortUrl }: Props) {
 							<FormField field={field} label="URL" required>
 								<InputGroup>
 									<InputGroupInput
+										id={field.name}
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={(event) => field.handleChange(event.target.value)}
@@ -118,6 +119,7 @@ export function CreateLinkCardContent({ setShortUrl }: Props) {
 						{(field) => (
 							<FormField field={field} label="Alias" required={false}>
 								<AliasField
+									id={field.name}
 									value={field.state.value}
 									onChange={field.handleChange}
 									isPending={isAliasPending(
