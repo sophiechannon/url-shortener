@@ -28,7 +28,16 @@ if (!rootElement) throw new Error("Root element #root not found");
 
 createRoot(rootElement).render(
 	<StrictMode>
-		<ClerkProvider afterSignOutUrl="/" appearance={{ theme: shadcn }}>
+		<ClerkProvider
+			afterSignOutUrl="/"
+			appearance={{
+				theme: shadcn,
+				// Match the app's fonts (see --font-sans / --font-heading in index.css).
+				variables: { fontFamily: '"Figtree Variable", sans-serif' },
+				elements: { headerTitle: "font-heading text-lg font-medium" },
+				options: { unsafe_disableDevelopmentModeWarnings: true },
+			}}
+		>
 			<QueryClientProvider client={queryClient}>
 				<RouterProvider router={router} />
 			</QueryClientProvider>
