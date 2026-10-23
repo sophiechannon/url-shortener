@@ -8,7 +8,7 @@ export const LinksParamsSchema = z
 	.openapi("LinksParams");
 
 export const CheckAvailabilitySearchParams = z
-	.object({ shortUrl: z.string() })
+	.object({ shortUrl: z.string().min(1) })
 	.openapi("CheckAvailabilitySearchParams");
 
 export const ListLinksSearchParamsSchema = CursorPaginationSchema.openapi(

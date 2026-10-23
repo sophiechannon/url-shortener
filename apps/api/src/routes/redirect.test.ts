@@ -33,19 +33,19 @@ describe("GET /:shortUrl", () => {
 		expect(await res.json()).toEqual({ error: "Not found" });
 	});
 
-	it.each(["/health", "/openapi.json", "/links"])(
-		"does not shadow %s",
-		async (path) => {
-			// A link whose short URL matches a real route must not take it over.
-			await testDb
-				.insert(links)
-				.values({ shortUrl: path.slice(1), originalUrl: "https://evil.com" });
+	it.each([
+		["/health", 200],
+		["/openapi.json", 200],
+		// The real route answers: GET /links is a 401 when signed out.
+		["/links", 401],
+	])("does not shadow %s", async (path, status) => {
+		// A link whose short URL matches a real route must not take it over.
+		await testDb
+			.insert(links)
+			.values({ shortUrl: path.slice(1), originalUrl: "https://evil.com" });
 
-			const res = await app.request(path);
+		const res = await app.request(path);
 
-			// The real route answers (GET /links is a 401 when signed out).
-			expect(res.status).not.toBe(302);
-			expect(res.headers.get("Location")).toBeNull();
-		},
-	);
+		expect(res.status).toBe(status);
+	});
 });

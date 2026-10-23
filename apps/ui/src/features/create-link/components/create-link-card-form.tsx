@@ -4,7 +4,6 @@ import { z } from "zod";
 import { ApiError } from "@/api/fetcher";
 import { FormField } from "@/components";
 import { Button } from "@/components/ui/button";
-import { CardContent } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { showToast } from "@/lib/toast";
@@ -36,7 +35,7 @@ type Props = {
 	setShortUrl: (value: { shortUrl: string; originalUrl: string }) => void;
 };
 
-export function CreateLinkCardContent({ setShortUrl }: Props) {
+export function CreateLinkCardForm({ setShortUrl }: Props) {
 	const [checkedAlias, setCheckedAlias] = useState<string>();
 	const checkAliasAvailability = useCheckAliasAvailability();
 	const createLink = useCreateLink();
@@ -75,74 +74,69 @@ export function CreateLinkCardContent({ setShortUrl }: Props) {
 	});
 
 	return (
-		<CardContent>
-			<form
-				onSubmit={(event) => {
-					event.preventDefault();
-					event.stopPropagation();
-					form.handleSubmit();
-				}}
-			>
-				<FieldGroup>
-					<form.Field name="originalUrl">
-						{(field) => (
-							<FormField field={field} label="URL" required>
-								<InputGroup>
-									<InputGroupInput
-										id={field.name}
-										value={field.state.value}
-										onBlur={field.handleBlur}
-										onChange={(event) => field.handleChange(event.target.value)}
-									/>
-								</InputGroup>
-							</FormField>
-						)}
-					</form.Field>
-					<form.Field
-						name="alias"
-						validators={{
-							onChangeAsync: async ({ value, signal }) => {
-								if (!value) return undefined;
-								try {
-									const isAvailable = await checkAliasAvailability(
-										value,
-										signal,
-									);
-									return isAvailable ? undefined : { message: "Not available" };
-								} finally {
-									if (!signal.aborted) setCheckedAlias(value);
-								}
-							},
-						}}
-						asyncDebounceMs={300}
-					>
-						{(field) => (
-							<FormField field={field} label="Alias" required={false}>
-								<AliasField
+		<form
+			onSubmit={(event) => {
+				event.preventDefault();
+				event.stopPropagation();
+				form.handleSubmit();
+			}}
+		>
+			<FieldGroup>
+				<form.Field name="originalUrl">
+					{(field) => (
+						<FormField field={field} label="URL" required>
+							<InputGroup>
+								<InputGroupInput
 									id={field.name}
 									value={field.state.value}
-									onChange={field.handleChange}
-									isPending={isAliasPending(
-										field.state.value,
-										field.state.meta.errorMap.onChange,
-										checkedAlias,
-									)}
-									isValid={field.state.meta.isValid}
+									onBlur={field.handleBlur}
+									onChange={(event) => field.handleChange(event.target.value)}
 								/>
-							</FormField>
-						)}
-					</form.Field>
-					<form.Subscribe
-						selector={(state) => [state.canSubmit, state.isSubmitting] as const}
-					>
-						{([canSubmit, isSubmitting]) => (
-							<Button type="submit" disabled={!canSubmit || isSubmitting}>
-								Submit
-							</Button>
-						)}
-					</form.Subscribe>
-				</FieldGroup>
-			</form>
-		</CardContent>
+							</InputGroup>
+						</FormField>
+					)}
+				</form.Field>
+				<form.Field
+					name="alias"
+					validators={{
+						onChangeAsync: async ({ value, signal }) => {
+							if (!value) return undefined;
+							try {
+								const isAvailable = await checkAliasAvailability(value, signal);
+								return isAvailable ? undefined : { message: "Not available" };
+							} finally {
+								if (!signal.aborted) setCheckedAlias(value);
+							}
+						},
+					}}
+					asyncDebounceMs={300}
+				>
+					{(field) => (
+						<FormField field={field} label="Alias" required={false}>
+							<AliasField
+								id={field.name}
+								value={field.state.value}
+								onChange={field.handleChange}
+								isPending={isAliasPending(
+									field.state.value,
+									field.state.meta.errorMap.onChange,
+									checkedAlias,
+								)}
+								isValid={field.state.meta.isValid}
+							/>
+						</FormField>
+					)}
+				</form.Field>
+				<form.Subscribe
+					selector={(state) => [state.canSubmit, state.isSubmitting] as const}
+				>
+					{([canSubmit, isSubmitting]) => (
+						<Button type="submit" disabled={!canSubmit || isSubmitting}>
+							Submit
+						</Button>
+					)}
+				</form.Subscribe>
+			</FieldGroup>
+		</form>
 	);
 }

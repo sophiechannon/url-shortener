@@ -1,7 +1,6 @@
-import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/react";
+import { Show, UserButton } from "@clerk/react";
 import { Link } from "@tanstack/react-router";
 import { memo } from "react";
-import { Button } from "@/components/ui/button";
 import { ModeToggle } from "../mode-toggle";
 
 export const SiteHeader = memo(function SiteHeader() {
@@ -13,14 +12,6 @@ export const SiteHeader = memo(function SiteHeader() {
 				</Link>
 				<div className="flex items-center gap-2">
 					<ModeToggle />
-					<Show when="signed-out">
-						<SignInButton>
-							<Button variant="ghost">Sign in</Button>
-						</SignInButton>
-						<SignUpButton>
-							<Button>Sign up</Button>
-						</SignUpButton>
-					</Show>
 					<Show when="signed-in">
 						<UserButton />
 					</Show>

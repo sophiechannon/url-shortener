@@ -29,6 +29,8 @@ if (!rootElement) throw new Error("Root element #root not found");
 createRoot(rootElement).render(
 	<StrictMode>
 		<ClerkProvider
+			routerPush={(to) => router.navigate({ href: to })}
+			routerReplace={(to) => router.navigate({ href: to, replace: true })}
 			afterSignOutUrl="/"
 			appearance={{
 				theme: shadcn,

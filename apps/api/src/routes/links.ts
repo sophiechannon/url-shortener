@@ -140,7 +140,7 @@ links
 				shortUrl: linksTable.shortUrl,
 			})
 			.from(linksTable)
-			.where(shortUrl ? eq(linksTable.shortUrl, shortUrl) : undefined)
+			.where(eq(linksTable.shortUrl, shortUrl))
 			.limit(1);
 		return c.json(!matchedLinks.length, 200);
 	})

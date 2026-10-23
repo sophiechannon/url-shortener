@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { delay, HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, it } from "vitest";
+import { auth } from "@/test/clerk";
 import { API_URL, db } from "@/test/handlers";
 import { mockIntersectionObserver } from "@/test/intersection-observer";
 import { renderWithProviders } from "@/test/render";
@@ -10,6 +11,8 @@ import { MyLinksCard } from "./my-links-card";
 let observer: ReturnType<typeof mockIntersectionObserver>;
 beforeEach(() => {
 	observer = mockIntersectionObserver();
+	// The card is only shown to signed-in users, and GET /links requires it.
+	auth.signIn();
 });
 
 // Data rows only, skipping the header row.
@@ -37,6 +40,16 @@ describe("MyLinksCard", () => {
 			"aria-busy",
 			"true",
 		);
+	});
+
+	it("lists only the signed-in user's links", async () => {
+		db.seed(2, "user_someone_else");
+
+		await renderWithProviders(<MyLinksCard />);
+
+		expect(
+			await screen.findByText("You have no links yet, why not create one now?"),
+		).toBeInTheDocument();
 	});
 
 	it("lists links with their short and original URLs", async () => {

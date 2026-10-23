@@ -7,15 +7,19 @@ import {
 } from "@tanstack/react-table";
 import { Suspense, useRef } from "react";
 import { CopyButton } from "@/components";
-import { Icon } from "@/components/icon";
 import { InfiniteScroll } from "@/components/inifinite-scroll/infinite-scroll";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLinksTable } from "../hooks/use-links-table";
 import type { LinkRow } from "../schemas/link-row";
 import { DeleteLinkButton } from "./delete-button";
+import { LinksTablePlaceholder } from "./links-table-placeholder";
 import { LinksTableSkeleton } from "./links-table-skeleton";
 
 const _features = tableFeatures({});
+
+type Props = {
+	placeholder?: string;
+};
 
 const columns: ColumnDef<typeof _features, LinkRow>[] = [
 	{
@@ -53,7 +57,7 @@ const columns: ColumnDef<typeof _features, LinkRow>[] = [
 	},
 ];
 
-export function LinksTable() {
+export function LinksTable({ placeholder }: Props) {
 	const { linkRows, ...rest } = useLinksTable();
 	const table = useTable<typeof _features, LinkRow>({
 		features: _features,
@@ -63,10 +67,9 @@ export function LinksTable() {
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	if (!linkRows.length) {
 		return (
-			<div className="h-50 flex justify-between">
-				You have no links yet, why not create one now?
-				<Icon name="link" className="h-50 w-50 text-primary" />
-			</div>
+			<LinksTablePlaceholder>
+				{placeholder ?? "You have no links yet, why not create one now?"}
+			</LinksTablePlaceholder>
 		);
 	}
 

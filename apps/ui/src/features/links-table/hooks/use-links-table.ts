@@ -1,5 +1,5 @@
 import type { Link } from "@/api/generated/url-shortener-api.schemas";
-import { localApi } from "@/features/create-link/components/link-result-card-content";
+import { localApi } from "@/features/create-link/components/link-result-card";
 import type { LinkRow } from "../schemas/link-row";
 import { useLinksInfinite } from "./queries/use-links-inifinte";
 

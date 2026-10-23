@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { memo, type PropsWithChildren, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CreateLinkCardContent } from "./create-link-card-content";
-import { LinkResultCard } from "./link-result-card-content";
+import { CreateLinkCardForm } from "./create-link-card-form";
+import { LinkResult } from "./link-result-card";
 
-type Props = {
+type Props = PropsWithChildren & {
 	className?: string;
 };
 
-export function CreateLinkCard({ className }: Props) {
+export const CreateLinkCard = memo(function CreateLinkCard({
+	className,
+	children,
+}: Props) {
 	const [urls, setUrls] = useState<{ shortUrl: string; originalUrl: string }>();
 	const header = urls ? "Success! Your short URL..." : "Shorten any URL...";
 	const resetUrls = () => {
@@ -18,17 +21,18 @@ export function CreateLinkCard({ className }: Props) {
 			<CardHeader>
 				<CardTitle>{header}</CardTitle>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="gap-10 flex flex-col">
 				{!urls ? (
-					<CreateLinkCardContent setShortUrl={setUrls} />
+					<CreateLinkCardForm setShortUrl={setUrls} />
 				) : (
-					<LinkResultCard
+					<LinkResult
 						shortUrl={urls.shortUrl}
 						originalUrl={urls.originalUrl}
 						resetUrls={resetUrls}
 					/>
 				)}
+				{children}
 			</CardContent>
 		</Card>
 	);
-}
+});

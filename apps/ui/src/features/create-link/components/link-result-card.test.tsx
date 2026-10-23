@@ -1,12 +1,12 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/test/render";
-import { LinkResultCard } from "./link-result-card-content";
+import { LinkResult } from "./link-result-card";
 
 const renderCard = async () => {
 	const resetUrls = vi.fn();
 	const result = await renderWithProviders(
-		<LinkResultCard
+		<LinkResult
 			originalUrl="https://example.com/long"
 			shortUrl="abc123"
 			resetUrls={resetUrls}

@@ -2,6 +2,7 @@ import { screen, within } from "@testing-library/react";
 import { HttpResponse, http } from "msw";
 import { describe, expect, it } from "vitest";
 import { MyLinksCard } from "@/features/links-table";
+import { auth, TEST_USER } from "@/test/clerk";
 import { API_URL, db } from "@/test/handlers";
 import { renderWithProviders } from "@/test/render";
 import { server } from "@/test/server";
@@ -47,7 +48,10 @@ describe("CreateLinkCard", () => {
 			"http://localhost:3000/my-alias",
 		);
 		expect(db.links).toEqual([
-			{ originalUrl: "https://example.com", shortUrl: "my-alias" },
+			expect.objectContaining({
+				originalUrl: "https://example.com",
+				shortUrl: "my-alias",
+			}),
 		]);
 	});
 
@@ -194,7 +198,18 @@ describe("CreateLinkCard", () => {
 		expect(screen.getByLabelText(/URL/)).toHaveValue("https://example.com");
 	});
 
-	it("adds the new link to My Links", async () => {
+	it("creates links without an owner when signed out", async () => {
+		const { user } = await renderCard();
+
+		await user.type(screen.getByLabelText(/URL/), "https://example.com");
+		await user.click(submitButton());
+
+		await screen.findByText("Success! Your short URL...");
+		expect(db.links).toEqual([expect.objectContaining({ userId: null })]);
+	});
+
+	it("adds the new link to My Links when signed in", async () => {
+		auth.signIn();
 		const { user } = await renderWithProviders(
 			<>
 				<CreateLinkCard />
@@ -211,5 +226,6 @@ describe("CreateLinkCard", () => {
 		expect(
 			await within(table).findByRole("link", { name: "https://example.com" }),
 		).toBeInTheDocument();
+		expect(db.links).toEqual([expect.objectContaining({ userId: TEST_USER })]);
 	});
 });

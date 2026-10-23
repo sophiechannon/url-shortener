@@ -83,6 +83,9 @@ describe("GET /links", () => {
 		});
 
 		expect(res.status).toBe(401);
+		expect(await res.json()).toEqual({
+			error: "Invalid authorization header",
+		});
 	});
 
 	it("returns an empty page when there are no links", async () => {
@@ -212,10 +215,17 @@ describe("GET /links/availability", () => {
 		expect(await res.json()).toBe(false);
 	});
 
-	it("requires a shortUrl", async () => {
-		const res = await app.request("/links/availability");
+	it.each([
+		["", "missing"],
+		["?shortUrl=", "empty"],
+	])("rejects a %s shortUrl", async (query) => {
+		// An empty short URL must not match every link and report "taken".
+		await seedLinks(1);
+
+		const res = await app.request(`/links/availability${query}`);
 
 		expect(res.status).toBe(400);
+		expect(await res.json()).toMatchObject({ error: "Validation failed" });
 	});
 });
 
@@ -309,6 +319,7 @@ describe("POST /links", () => {
 		const res = await postLink({ originalUrl: "https://example.com" });
 
 		expect(res.status).toBe(409);
+		expect(await res.json()).toEqual({ error: "Short URL already in use" });
 		expect(await testDb.select().from(links)).toHaveLength(3);
 	});
 

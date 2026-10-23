@@ -2,11 +2,15 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 import { toast } from "@/components/ui/toast";
+import { auth } from "./clerk";
 import { db } from "./handlers";
 import { server } from "./server";
 
 beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
-beforeEach(() => db.reset());
+beforeEach(() => {
+	db.reset();
+	auth.signOut();
+});
 afterEach(() => {
 	cleanup();
 	server.resetHandlers();
@@ -17,16 +21,8 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-// Clerk needs a real publishable key and network access, so tests render as a
-// signed-out user with the auth controls stubbed.
-vi.mock("@clerk/react", () => ({
-	Show: ({ when, children }: { when: string; children: React.ReactNode }) =>
-		when === "signed-out" ? children : null,
-	SignInButton: ({ children }: { children: React.ReactNode }) => children,
-	SignUpButton: ({ children }: { children: React.ReactNode }) => children,
-	UserButton: () => null,
-	getToken: async () => null,
-}));
+// Tests render signed out unless they call auth.signIn() (see ./clerk).
+vi.mock("@clerk/react", () => import("./clerk"));
 
 // jsdom doesn't implement these browser APIs.
 Object.defineProperty(window, "matchMedia", {

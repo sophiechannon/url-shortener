@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { auth } from "@/test/clerk";
 import { renderWithProviders } from "@/test/render";
 import { SiteHeader } from "./site-header";
 
@@ -19,12 +20,16 @@ describe("SiteHeader", () => {
 		).toBeInTheDocument();
 	});
 
-	it("shows sign in and sign up buttons when signed out", async () => {
+	it("shows the user menu instead when signed in", async () => {
+		auth.signIn();
+
 		await renderWithProviders(<SiteHeader />);
 
 		expect(
-			await screen.findByRole("button", { name: "Sign in" }),
+			await screen.findByRole("button", { name: "User menu" }),
 		).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: "Sign up" })).toBeInTheDocument();
+		expect(
+			screen.queryByRole("button", { name: "Sign in" }),
+		).not.toBeInTheDocument();
 	});
 });
