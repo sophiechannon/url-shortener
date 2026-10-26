@@ -1,9 +1,7 @@
 import { getToken } from "@clerk/react";
+import { apiBaseUrl } from "@/lib/api-url";
 
 // Every generated request goes through here (see orval.config.ts).
-// In dev, VITE_API_URL is unset and requests go to /api, which Vite
-// proxies to the local API. In production, set VITE_API_URL to the API's URL.
-const baseUrl = import.meta.env.VITE_API_URL ?? "/api";
 
 export class ApiError extends Error {
 	readonly status: number;
@@ -26,7 +24,7 @@ export const customFetch = async <T>(
 	const headers = new Headers(options.headers);
 	if (token) headers.set("Authorization", `Bearer ${token}`);
 
-	const res = await fetch(`${baseUrl}${url}`, { ...options, headers });
+	const res = await fetch(`${apiBaseUrl}${url}`, { ...options, headers });
 	const body = [204, 205, 304].includes(res.status) ? "" : await res.text();
 	const data = body ? JSON.parse(body) : undefined;
 

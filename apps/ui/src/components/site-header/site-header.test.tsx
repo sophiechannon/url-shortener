@@ -8,7 +8,9 @@ describe("SiteHeader", () => {
 	it("links the title to the home page", async () => {
 		await renderWithProviders(<SiteHeader />);
 
-		const title = await screen.findByRole("heading", { name: "URL SHORTENER" });
+		const title = await screen.findByRole("heading", {
+			name: "URL LENGTHENER",
+		});
 		expect(title.closest("a")).toHaveAttribute("href", "/");
 	});
 
@@ -20,6 +22,17 @@ describe("SiteHeader", () => {
 		).toBeInTheDocument();
 	});
 
+	it("links to the authenticate page when signed out", async () => {
+		await renderWithProviders(<SiteHeader />);
+
+		expect(
+			await screen.findByRole("link", { name: "Sign in" }),
+		).toHaveAttribute("href", "/authenticate");
+		expect(
+			screen.queryByRole("button", { name: "User menu" }),
+		).not.toBeInTheDocument();
+	});
+
 	it("shows the user menu instead when signed in", async () => {
 		auth.signIn();
 
@@ -29,7 +42,7 @@ describe("SiteHeader", () => {
 			await screen.findByRole("button", { name: "User menu" }),
 		).toBeInTheDocument();
 		expect(
-			screen.queryByRole("button", { name: "Sign in" }),
+			screen.queryByRole("link", { name: "Sign in" }),
 		).not.toBeInTheDocument();
 	});
 });

@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev:api": "pnpm --filter @url-shortener/api dev",
 		"dev:ui": "pnpm --filter @url-shortener/ui dev",
+		"dev:ui:lambda": "pnpm --filter @url-shortener/ui dev:lambda",
 		"build": "pnpm -r build",
 		"typecheck": "pnpm -r typecheck",
 		"test": "pnpm -r test",

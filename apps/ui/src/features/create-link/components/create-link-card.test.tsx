@@ -10,7 +10,7 @@ import { CreateLinkCard } from "./create-link-card";
 
 const renderCard = async () => {
 	const result = await renderWithProviders(<CreateLinkCard />);
-	await screen.findByText("Shorten any URL...");
+	await screen.findByText("Give it a go...");
 	return result;
 };
 
@@ -29,9 +29,7 @@ describe("CreateLinkCard", () => {
 		expect(screen.getByLabelText("Original URL")).toHaveValue(
 			"https://example.com",
 		);
-		expect(screen.getByLabelText("Short URL")).toHaveValue(
-			"http://localhost:3000/gen1",
-		);
+		expect(screen.getByLabelText("Short URL")).toHaveValue(`${API_URL}/gen1`);
 	});
 
 	it("uses the alias when one is given", async () => {
@@ -45,7 +43,7 @@ describe("CreateLinkCard", () => {
 		await user.click(submitButton());
 
 		expect(await screen.findByLabelText("Short URL")).toHaveValue(
-			"http://localhost:3000/my-alias",
+			`${API_URL}/my-alias`,
 		);
 		expect(db.links).toEqual([
 			expect.objectContaining({
@@ -64,7 +62,7 @@ describe("CreateLinkCard", () => {
 			await screen.findByRole("button", { name: "Create Another" }),
 		);
 
-		expect(await screen.findByText("Shorten any URL...")).toBeInTheDocument();
+		expect(await screen.findByText("Give it a go...")).toBeInTheDocument();
 		expect(screen.getByLabelText(/URL/)).toHaveValue("");
 		expect(screen.getByLabelText("Alias")).toHaveValue("");
 	});
@@ -178,7 +176,7 @@ describe("CreateLinkCard", () => {
 		await user.click(submitButton());
 
 		expect(await screen.findByText("Not available")).toBeInTheDocument();
-		expect(screen.getByText("Shorten any URL...")).toBeInTheDocument();
+		expect(screen.getByText("Give it a go...")).toBeInTheDocument();
 	});
 
 	it("shows a toast when the link cannot be created", async () => {
@@ -216,7 +214,7 @@ describe("CreateLinkCard", () => {
 				<MyLinksCard />
 			</>,
 		);
-		await screen.findByText("Shorten any URL...");
+		await screen.findByText("Lengthen any URL...");
 		await screen.findByText("You have no links yet, why not create one now?");
 
 		await user.type(screen.getByLabelText(/URL/), "https://example.com");

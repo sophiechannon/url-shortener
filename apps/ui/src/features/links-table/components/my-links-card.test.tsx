@@ -60,7 +60,7 @@ describe("MyLinksCard", () => {
 		const [first, second] = dataRows();
 		expect(
 			within(first).getByRole("link", {
-				name: "http://localhost:3000/short-1",
+				name: `${API_URL}/short-1`,
 			}),
 		).toBeInTheDocument();
 		expect(
@@ -68,7 +68,7 @@ describe("MyLinksCard", () => {
 		).toBeInTheDocument();
 		expect(
 			within(second).getByRole("link", {
-				name: "http://localhost:3000/short-2",
+				name: `${API_URL}/short-2`,
 			}),
 		).toBeInTheDocument();
 	});
@@ -100,9 +100,7 @@ describe("MyLinksCard", () => {
 			within(dataRows()[0]).getByRole("button", { name: "copy short URL" }),
 		);
 
-		expect(await navigator.clipboard.readText()).toBe(
-			"http://localhost:3000/short-1",
-		);
+		expect(await navigator.clipboard.readText()).toBe(`${API_URL}/short-1`);
 	});
 
 	it("loads 10 links at a time and fetches more on scroll", async () => {
@@ -142,9 +140,7 @@ describe("MyLinksCard", () => {
 		);
 
 		await waitFor(() => expect(dataRows()).toHaveLength(1));
-		expect(
-			screen.queryByText("http://localhost:3000/short-1"),
-		).not.toBeInTheDocument();
+		expect(screen.queryByText(`${API_URL}/short-1`)).not.toBeInTheDocument();
 		expect(db.links.map((l) => l.shortUrl)).toEqual(["short-2"]);
 	});
 

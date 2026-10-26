@@ -131,7 +131,11 @@ export function CreateLinkCardForm({ setShortUrl }: Props) {
 					selector={(state) => [state.canSubmit, state.isSubmitting] as const}
 				>
 					{([canSubmit, isSubmitting]) => (
-						<Button type="submit" disabled={!canSubmit || isSubmitting}>
+						<Button
+							type="submit"
+							className="mt-4"
+							disabled={!canSubmit || isSubmitting}
+						>
 							Submit
 						</Button>
 					)}

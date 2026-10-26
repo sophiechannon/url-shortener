@@ -1,5 +1,5 @@
 import type { Link } from "@/api/generated/url-shortener-api.schemas";
-import { localApi } from "@/features/create-link/components/link-result-card";
+import { shortLinkBaseUrl } from "@/lib/api-url";
 import type { LinkRow } from "../schemas/link-row";
 import { useLinksInfinite } from "./queries/use-links-inifinte";
 
@@ -24,6 +24,6 @@ export function useLinksTable() {
 function mapLinksToLinkRow(links: Link[]): LinkRow[] {
 	return links.map((link) => ({
 		originalUrl: link.originalUrl,
-		shortUrl: { display: localApi + link.shortUrl, key: link.shortUrl },
+		shortUrl: { display: shortLinkBaseUrl + link.shortUrl, key: link.shortUrl },
 	}));
 }

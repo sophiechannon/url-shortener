@@ -8,6 +8,7 @@ import {
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group";
+import { shortLinkBaseUrl } from "@/lib/api-url";
 
 type Props = {
 	originalUrl: string;
@@ -15,11 +16,8 @@ type Props = {
 	resetUrls: () => void;
 };
 
-// temporary while using proxy. use VITE_API_URL when deployed
-export const localApi = "http://localhost:3000/";
-
 export function LinkResult({ originalUrl, shortUrl, resetUrls }: Props) {
-	const fullShortUrl = localApi + shortUrl;
+	const fullShortUrl = shortLinkBaseUrl + shortUrl;
 
 	return (
 		<FieldGroup>

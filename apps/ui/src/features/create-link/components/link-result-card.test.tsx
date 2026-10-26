@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { API_URL } from "@/test/handlers";
 import { renderWithProviders } from "@/test/render";
 import { LinkResult } from "./link-result-card";
 
@@ -22,9 +23,7 @@ describe("LinkResultCard", () => {
 		expect(await screen.findByLabelText("Original URL")).toHaveValue(
 			"https://example.com/long",
 		);
-		expect(screen.getByLabelText("Short URL")).toHaveValue(
-			"http://localhost:3000/abc123",
-		);
+		expect(screen.getByLabelText("Short URL")).toHaveValue(`${API_URL}/abc123`);
 	});
 
 	it("copies the full short URL", async () => {
@@ -34,9 +33,7 @@ describe("LinkResultCard", () => {
 			await screen.findByRole("button", { name: "copy short URL" }),
 		);
 
-		expect(await navigator.clipboard.readText()).toBe(
-			"http://localhost:3000/abc123",
-		);
+		expect(await navigator.clipboard.readText()).toBe(`${API_URL}/abc123`);
 	});
 
 	it("starts over when 'Create Another' is clicked", async () => {
