@@ -9,7 +9,7 @@ describe("SiteHeader", () => {
 		await renderWithProviders(<SiteHeader />);
 
 		const title = await screen.findByRole("heading", {
-			name: "URL LENGTHENER",
+			name: "//BigUrl",
 		});
 		expect(title.closest("a")).toHaveAttribute("href", "/");
 	});

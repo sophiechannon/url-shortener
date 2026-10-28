@@ -5,7 +5,7 @@ import {
 	tableFeatures,
 	useTable,
 } from "@tanstack/react-table";
-import { Suspense, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { CopyButton } from "@/components";
 import { InfiniteScroll } from "@/components/inifinite-scroll/infinite-scroll";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -27,7 +27,7 @@ const columns: ColumnDef<typeof _features, LinkRow>[] = [
 		header: "Short URL",
 		cell: ({ row }) => {
 			return (
-				<div className="flex flex-row gap-2 align-middle">
+				<div className="flex flex-row gap-2 align-top">
 					<CopyButton
 						label="copy short URL"
 						text={row.original.shortUrl.display}
@@ -43,7 +43,10 @@ const columns: ColumnDef<typeof _features, LinkRow>[] = [
 		accessorKey: "originalUrl",
 		header: "Original URL",
 		cell: ({ row }) => (
-			<Link className="wrap-anywhere" to={row.original.originalUrl}>
+			<Link
+				className="wrap-anywhere align-top h-full"
+				to={row.original.originalUrl}
+			>
 				{row.original.originalUrl}
 			</Link>
 		),
@@ -64,7 +67,28 @@ export function LinksTable({ placeholder }: Props) {
 		data: linkRows,
 		columns,
 	});
+
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const stuckSentinelRef = useRef<HTMLDivElement>(null);
+	const tableHeadRef = useRef<HTMLTableSectionElement>(null);
+	const hasRows = linkRows.length > 0;
+
+	useEffect(() => {
+		const sentinel = stuckSentinelRef.current;
+		const tableHead = tableHeadRef.current;
+		if (!hasRows || !sentinel || !tableHead) {
+			return;
+		}
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				tableHead.toggleAttribute("data-stuck", !entry.isIntersecting);
+			},
+			{ root: scrollContainerRef.current, threshold: 0 },
+		);
+		observer.observe(sentinel);
+		return () => observer.disconnect();
+	}, [hasRows]);
+
 	if (!linkRows.length) {
 		return (
 			<LinksTablePlaceholder>
@@ -74,10 +98,14 @@ export function LinksTable({ placeholder }: Props) {
 	}
 
 	return (
-		<ScrollArea className="h-50" ref={scrollContainerRef}>
+		<ScrollArea className="h-full" ref={scrollContainerRef}>
 			<InfiniteScroll containerRef={scrollContainerRef} {...rest}>
+				<div ref={stuckSentinelRef} aria-hidden />
 				<table className="w-full text-left text-sm">
-					<thead className="sticky top-0 bg-card">
+					<thead
+						className="sticky top-0 bg-card data-stuck:shadow-sm"
+						ref={tableHeadRef}
+					>
 						{table.getHeaderGroups().map((headerGroup) => (
 							<tr key={headerGroup.id}>
 								{headerGroup.headers.map((header) => (
@@ -94,7 +122,7 @@ export function LinksTable({ placeholder }: Props) {
 						{table.getRowModel().rows.map((row) => (
 							<tr key={row.id}>
 								{row.getAllCells().map((cell) => (
-									<td key={cell.id} className="p-2">
+									<td key={cell.id} className="p-2 align-top">
 										<FlexRender cell={cell} />
 									</td>
 								))}
@@ -110,7 +138,9 @@ export function LinksTable({ placeholder }: Props) {
 export function LinksTableSuspense() {
 	return (
 		<Suspense fallback={<LinksTableSkeleton />}>
-			<LinksTable />
+			<div className="min-h-0 flex-1">
+				<LinksTable />
+			</div>
 		</Suspense>
 	);
 }

@@ -1,6 +1,7 @@
 import { useAuth } from "@clerk/react";
 import { memo, type PropsWithChildren, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CreateLinkCardForm } from "./create-link-card-form";
 import { LinkResult } from "./link-result-card";
 
@@ -14,18 +15,20 @@ export const CreateLinkCard = memo(function CreateLinkCard({
 }: Props) {
 	const { isSignedIn } = useAuth();
 	const [urls, setUrls] = useState<{ shortUrl: string; originalUrl: string }>();
-	const header = urls
-		? "Success! Your short URL..."
-		: isSignedIn
-			? "Lengthen any URL..."
-			: "Give it a go...";
+	const getHeader = () => {
+		if (isSignedIn == null) return <Skeleton className="h-7" />;
+		if (urls) {
+			return "Success! Your short URL...";
+		}
+		return isSignedIn ? "Lengthen any URL..." : "Give it a go...";
+	};
 	const resetUrls = () => {
 		setUrls(undefined);
 	};
 	return (
 		<Card className={className}>
 			<CardHeader>
-				<CardTitle>{header}</CardTitle>
+				<CardTitle>{getHeader()}</CardTitle>
 			</CardHeader>
 			<CardContent className="gap-10 flex flex-1 flex-col justify-center">
 				{!urls ? (

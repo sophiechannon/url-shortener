@@ -9,8 +9,8 @@ export function LinksTableSkeleton() {
 			<thead>
 				<tr>
 					{HEADERS.map((header) => (
-						<th key={header} className="p-2 font-medium">
-							{header}
+						<th key={header} className="p-2">
+							<Skeleton className="h-6 flex-1" />
 						</th>
 					))}
 				</tr>
