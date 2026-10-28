@@ -10,12 +10,12 @@ export const Route = createFileRoute("/_app/")({
 
 function HomePage() {
 	return (
-		<div className="min-h-0 flex-1  gap-6 flex flex-col">
+		<div className="min-h-0 flex-1 overflow-auto gap-6 flex flex-col">
 			<div className="flex w-full flex-col xl:flex-row gap-6 p-20 bg-primary border-b-yellow-200 border-b-8">
 				<Card className="xl:flex-1 bg-linear-to-r from-yellow-100 from-10% to-yellow-200 border-yellow-200 dark:text-yellow-200 dark:bg-none dark:bg-card">
 					<CardHeader>
 						<CardTitle className="text-4xl">
-							Consistently {getUrlLengthType()} and annoying URLs. Guaranteed.
+							Consistently {getUrlLengthType()} and annoying URLs.
 						</CardTitle>
 					</CardHeader>
 					<CardContent className="text-lg">
@@ -26,7 +26,7 @@ function HomePage() {
 				</Card>
 				<CreateLinkCard className="min-w-0 xl:flex-1" />
 			</div>
-			<div className="flex min-h-0 max-h-175 flex-1 flex-col px-20 pb-10">
+			<div className="flex min-h-100 max-h-175 flex-1 flex-col px-20 pb-20">
 				<MyLinksCard />
 			</div>
 		</div>
