@@ -9,6 +9,7 @@ import { Suspense, useEffect, useRef } from "react";
 import { CopyButton } from "@/components";
 import { InfiniteScroll } from "@/components/inifinite-scroll/infinite-scroll";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { getUrlLengthType } from "@/lib/config";
 import { useLinksTable } from "../hooks/use-links-table";
 import type { LinkRow } from "../schemas/link-row";
 import { DeleteLinkButton } from "./delete-button";
@@ -24,12 +25,12 @@ type Props = {
 const columns: ColumnDef<typeof _features, LinkRow>[] = [
 	{
 		accessorKey: "shortUrl",
-		header: "Short URL",
+		header: `${getUrlLengthType({ capitalize: true })} URL`,
 		cell: ({ row }) => {
 			return (
 				<div className="flex flex-row gap-2 align-top">
 					<CopyButton
-						label="copy short URL"
+						label={`copy ${getUrlLengthType()} URL`}
 						text={row.original.shortUrl.display}
 					/>
 					<Link to={row.original.shortUrl.display}>

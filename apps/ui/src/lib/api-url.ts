@@ -1,7 +1,11 @@
 // VITE_API_URL is unset for local dev (`pnpm dev`): requests go to /api, which
 // Vite proxies to the local API. Set it (e.g. `pnpm dev:lambda`, or for a
+
+import { env } from "./env";
+
 // production build) to call a deployed API directly.
-const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+
+const apiUrl = env.VITE_API_URL?.replace(/\/$/, "");
 
 export const apiBaseUrl = apiUrl ?? "/api";
 

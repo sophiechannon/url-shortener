@@ -214,7 +214,7 @@ describe("CreateLinkCard", () => {
 				<MyLinksCard />
 			</>,
 		);
-		await screen.findByText("Lengthen any URL...");
+		await screen.findByText("Shorten any URL...");
 		await screen.findByText("You have no links yet, why not create one now?");
 
 		await user.type(screen.getByLabelText(/URL/), "https://example.com");

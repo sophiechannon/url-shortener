@@ -1,7 +1,12 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { getUrlLengthType } from "@/lib/config";
 
 const ROWS = 5;
-const HEADERS = ["Short URL", "Original URL", "Actions"];
+const HEADERS = [
+	`${getUrlLengthType({ capitalize: true })} URL`,
+	"Original URL",
+	"Actions",
+];
 
 export function LinksTableSkeleton() {
 	return (

@@ -9,6 +9,7 @@ import {
 	InputGroupInput,
 } from "@/components/ui/input-group";
 import { shortLinkBaseUrl } from "@/lib/api-url";
+import { getUrlLengthType } from "@/lib/config";
 
 type Props = {
 	originalUrl: string;
@@ -24,11 +25,17 @@ export function LinkResult({ originalUrl, shortUrl, resetUrls }: Props) {
 			<FieldLayout label="Original URL" fieldName="original-url">
 				<Input id="original-url" value={originalUrl} readOnly />
 			</FieldLayout>
-			<FieldLayout label="Short URL" fieldName="short-url">
+			<FieldLayout
+				label={`${getUrlLengthType({ capitalize: true })} URL`}
+				fieldName="short-url"
+			>
 				<InputGroup>
 					<InputGroupInput id="short-url" value={fullShortUrl} readOnly />
 					<InputGroupAddon>
-						<CopyButton text={fullShortUrl} label={"copy short URL"} />
+						<CopyButton
+							text={fullShortUrl}
+							label={`copy ${getUrlLengthType()} URL`}
+						/>
 					</InputGroupAddon>
 				</InputGroup>
 			</FieldLayout>

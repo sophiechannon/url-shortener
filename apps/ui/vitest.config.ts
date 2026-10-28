@@ -13,6 +13,6 @@ export default defineConfig({
 		environment: "jsdom",
 		setupFiles: ["./src/test/setup.ts"],
 		// Node's fetch needs an absolute URL; MSW handlers are registered against this.
-		env: { VITE_API_URL: "http://api.test" },
+		env: { VITE_API_URL: "http://api.test", VITE_IS_SHORT: "true" },
 	},
 });

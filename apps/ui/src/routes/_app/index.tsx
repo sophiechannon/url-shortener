@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreateLinkCard } from "@/features/create-link";
 import { MyLinksCard } from "@/features/links-table";
+import { getUrlLengthType } from "@/lib/config";
 
 export const Route = createFileRoute("/_app/")({
 	component: HomePage,
@@ -14,14 +15,13 @@ function HomePage() {
 				<Card className="xl:flex-1 bg-linear-to-r from-yellow-100 from-10% to-yellow-200 border-yellow-200 dark:text-yellow-200 dark:bg-none dark:bg-card">
 					<CardHeader>
 						<CardTitle className="text-4xl">
-							Consistently long and annoying URLs. Guaranteed.
+							Consistently {getUrlLengthType()} and annoying URLs. Guaranteed.
 						</CardTitle>
 					</CardHeader>
 					<CardContent className="text-lg">
-						This site uses AWS Lambda and Function URLs, and I don't want to
-						spend any money on a custom domain... so enjoy turning your
-						carefully constructed URLs into long and complicated ones that don't
-						make any sense!
+						This site uses AWS Lambda Function URLs and no custom domain... so
+						enjoy turning your carefully constructed URLs into{" "}
+						{getUrlLengthType()} and complicated ones that don't make any sense!
 					</CardContent>
 				</Card>
 				<CreateLinkCard className="min-w-0 xl:flex-1" />

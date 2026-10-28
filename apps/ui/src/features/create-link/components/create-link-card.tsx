@@ -2,6 +2,7 @@ import { useAuth } from "@clerk/react";
 import { memo, type PropsWithChildren, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getUrlLengthType } from "@/lib/config";
 import { CreateLinkCardForm } from "./create-link-card-form";
 import { LinkResult } from "./link-result-card";
 
@@ -18,9 +19,11 @@ export const CreateLinkCard = memo(function CreateLinkCard({
 	const getHeader = () => {
 		if (isSignedIn == null) return <Skeleton className="h-7" />;
 		if (urls) {
-			return "Success! Your short URL...";
+			return `Success! Your ${getUrlLengthType()} URL...`;
 		}
-		return isSignedIn ? "Lengthen any URL..." : "Give it a go...";
+		return isSignedIn
+			? `${getUrlLengthType({ verb: true, capitalize: true })} any URL...`
+			: "Give it a go...";
 	};
 	const resetUrls = () => {
 		setUrls(undefined);
