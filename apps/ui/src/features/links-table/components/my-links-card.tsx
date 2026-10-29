@@ -1,5 +1,8 @@
 import { useAuth } from "@clerk/react";
+import { Link } from "@tanstack/react-router";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib";
 import { LinksTableSuspense } from "./links-table";
 import { LinksTablePlaceholder } from "./links-table-placeholder";
 import { LinksTableSkeleton } from "./links-table-skeleton";
@@ -20,7 +23,15 @@ function LinksCardChildren() {
 				<LinksTableSuspense />
 			) : (
 				<LinksTablePlaceholder>
-					Coming soon... signed out links
+					<div className="gap-4 flex flex-col">
+						<div className="text-lg">
+							Sign in to save and view all your links
+						</div>
+						<Link to="/authenticate" className={cn(buttonVariants(), "w-fit")}>
+							Sign in
+						</Link>
+						<div>Coming soon... signed out links</div>
+					</div>
 				</LinksTablePlaceholder>
 			)}
 		</>

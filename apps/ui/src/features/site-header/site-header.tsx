@@ -2,7 +2,7 @@ import { Show, UserButton } from "@clerk/react";
 import { Link } from "@tanstack/react-router";
 import { memo } from "react";
 import { buttonVariants } from "@/components/ui/button";
-import { ModeToggle } from "../mode-toggle";
+import { ModeToggle } from "../../components/mode-toggle";
 
 export const SiteHeader = memo(function SiteHeader() {
 	return (
