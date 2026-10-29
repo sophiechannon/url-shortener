@@ -28,7 +28,7 @@ const columns: ColumnDef<typeof _features, LinkRow>[] = [
 		header: `${getUrlLengthType({ capitalize: true })} URL`,
 		cell: ({ row }) => {
 			return (
-				<div className="flex flex-row gap-2 align-top">
+				<div className="flex wrap-anywhere min-w-80 flex-row gap-2 align-top">
 					<CopyButton
 						label={`copy ${getUrlLengthType()} URL`}
 						text={row.original.shortUrl.display}
@@ -45,7 +45,7 @@ const columns: ColumnDef<typeof _features, LinkRow>[] = [
 		header: "Original URL",
 		cell: ({ row }) => (
 			<Link
-				className="wrap-anywhere align-top h-full"
+				className="block wrap-anywhere min-w-80 align-top h-full"
 				to={row.original.originalUrl}
 			>
 				{row.original.originalUrl}
