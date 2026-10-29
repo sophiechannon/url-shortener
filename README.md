@@ -1,5 +1,7 @@
 # url-shortener
 
+Live page: [https://url-shortener-4ug.pages.dev/](https://url-shortener-4ug.pages.dev/)
+
 Currently a URL lengthener thanks to the long Lambda function URLs!
 
 A URL shortener: a Hono + `@hono/zod-openapi` API deployed to AWS Lambda (Node 24), and a React UI.
