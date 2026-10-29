@@ -1,5 +1,7 @@
 # url-shortener
 
+Currently a URL lengthener thanks to the long Lambda function URLs!
+
 A URL shortener: a Hono + `@hono/zod-openapi` API deployed to AWS Lambda (Node 24), and a React UI.
 
 The OpenAPI spec (`apps/api/openapi.json`) is the contract between them. The UI generates its client from it.
@@ -9,7 +11,7 @@ The OpenAPI spec (`apps/api/openapi.json`) is the contract between them. The UI 
 ```
 apps/
   api/   Hono API, Drizzle schema and migrations, openapi.json
-  ui/    React client: Vite, React, TypeScript, TanStack Router (file-based routes in src/routes)
+  ui/    React client: Vite, React, TypeScript, TanStack Router, Clerk Authentication (file-based routes in src/routes)
 ```
 
 pnpm workspaces; Biome is configured once at the root.
@@ -19,8 +21,16 @@ pnpm workspaces; Biome is configured once at the root.
 - React based client
 - API (Hono Zod Openapi) 
 - Lambda & function URL
-- Redis layer for re-direct lookup
 - PostgresDB (Neon)
+
+## Cool features
+- Optimised from mobile
+- Infinite scroll on the links table
+- Realtime alias availability check
+- Responsive validation
+- Dark mode
+- Ability for users to delete their accounts and all their links in one go
+
 
 ## Scripts
 

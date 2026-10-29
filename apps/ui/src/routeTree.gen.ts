@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppAuthenticateRouteImport } from './routes/_app/authenticate'
+import { Route as AppPrivacyRouteImport } from './routes/_app/privacy'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -27,27 +28,35 @@ const AppAuthenticateRoute = AppAuthenticateRouteImport.update({
   path: '/authenticate',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPrivacyRoute = AppPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/authenticate': typeof AppAuthenticateRoute
+  '/privacy': typeof AppPrivacyRoute
 }
 export interface FileRoutesByTo {
   '/authenticate': typeof AppAuthenticateRoute
+  '/privacy': typeof AppPrivacyRoute
   '/': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_app/authenticate': typeof AppAuthenticateRoute
+  '/_app/privacy': typeof AppPrivacyRoute
   '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/authenticate'
+  fullPaths: '/' | '/authenticate' | '/privacy'
   fileRoutesByTo: FileRoutesByTo
-  to: '/authenticate' | '/'
-  id: '__root__' | '/_app' | '/_app/authenticate' | '/_app/'
+  to: '/authenticate' | '/privacy' | '/'
+  id: '__root__' | '/_app' | '/_app/authenticate' | '/_app/privacy' | '/_app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,16 +86,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthenticateRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/privacy': {
+      id: '/_app/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof AppPrivacyRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppAuthenticateRoute: typeof AppAuthenticateRoute
+  AppPrivacyRoute: typeof AppPrivacyRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAuthenticateRoute: AppAuthenticateRoute,
+  AppPrivacyRoute: AppPrivacyRoute,
   AppIndexRoute: AppIndexRoute,
 }
 

@@ -3,6 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { health } from "./routes/health";
 import { links } from "./routes/links";
 import { redirect } from "./routes/redirect";
+import { webhooks } from "./routes/webhooks";
 
 export const ErrorSchema = z
 	.object({ error: z.string(), details: z.unknown().optional() })
@@ -28,6 +29,7 @@ app.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
 
 app.route("/", health);
 app.route("/", links);
+app.route("/", webhooks);
 
 export const openApiConfig = {
 	openapi: "3.0.0",

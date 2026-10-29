@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_app/")({
 function HomePage() {
 	return (
 		<div className="min-h-0 flex-1 overflow-auto gap-6 flex flex-col">
-			<div className="flex w-full flex-col xl:flex-row gap-6 p-4 sm:p-20 bg-primary border-b-8">
+			<div className="flex w-full flex-col xl:flex-row gap-6 p-4 sm:p-20 bg-primary border-b-8 border-b-yellow-200">
 				<HeroCard />
 				<CreateLinkCard className="min-w-0 xl:flex-1" />
 			</div>
